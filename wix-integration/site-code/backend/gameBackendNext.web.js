@@ -213,6 +213,10 @@ export const recordAnswer=webMethod(Permissions.SiteMember,async p=>{
   await ownedAttempt(m,attempt,chapter,'matching');
   const pair=await first(wixData.query(C.pairs).eq('chapterId',chapter).eq('pairId',pairId).eq('isActive',true));
   if(!pair||!pair.itemId)fail('MATCHING_PAIR_NOT_FOUND');
+  const completedProgress=await first(wixData.query(C.chapterProgress).eq('memberId',m).eq('chapterId',chapter));
+  if(completedProgress&&Array.isArray(completedProgress.completedPairIds)&&completedProgress.completedPairIds.includes(pairId)){
+    fail('PAIR_ALREADY_COMPLETED');
+  }
   const [correctTask,selectedTask]=await Promise.all([
     first(wixData.query(C.tasks).eq('chapterId',chapter).eq('itemId',pair.itemId).eq('isActive',true)),
     first(wixData.query(C.tasks).eq('chapterId',chapter).eq('itemId',selected).eq('isActive',true))
