@@ -826,3 +826,98 @@ h1{font-weight:700;letter-spacing:-.025em}
     bottom: 22px;
   }
 }
+
+
+/* =========================================
+   LEARNER PROGRESS DASHBOARD
+   ========================================= */
+.progress-overview-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  margin:22px 0 34px;
+}
+.progress-overview-grid .result-stat{
+  min-height:116px;
+  justify-content:center;
+  background:#fffdf9;
+}
+.progress-overview-grid .result-stat strong{
+  font-family:Georgia,serif;
+  font-size:clamp(27px,3vw,38px);
+}
+.progress-subheading{
+  margin:34px 0 16px;
+}
+.progress-subheading h2{
+  margin:0;
+  color:var(--burgundy);
+  font-family:Georgia,serif;
+  font-weight:500;
+}
+.progress-chapter-list,
+.progress-attempt-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.progress-chapter-card{
+  margin:0;
+  padding:20px;
+  background:rgba(255,253,250,.96);
+}
+.progress-chapter-card .progress-track{
+  display:block;
+  width:100%;
+  height:8px;
+  margin:12px 0 8px;
+  background:#eadeda;
+}
+.progress-chapter-card p{
+  margin:0 0 5px;
+  color:var(--muted);
+  font-size:12px;
+}
+.progress-chapter-card small{
+  color:var(--sage);
+  font-size:11px;
+  line-height:1.6;
+}
+.progress-attempt-card{
+  margin:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:6px 12px;
+  padding:16px 18px;
+}
+.progress-attempt-card>div{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.progress-attempt-card strong{
+  color:var(--burgundy);
+  font-size:14px;
+}
+.progress-attempt-card small{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+.progress-attempt-card>b{
+  color:var(--burgundy);
+  font-family:Georgia,serif;
+  font-size:19px;
+}
+.progress-attempt-card>small:last-child{
+  grid-column:1/-1;
+  padding-top:6px;
+  border-top:1px solid var(--line);
+}
+@media(max-width:700px){
+  .progress-overview-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .progress-overview-grid .result-stat:last-child{grid-column:1/-1}
+  .progress-chapter-list,.progress-attempt-list{grid-template-columns:1fr}
+  .progress-chapter-card{padding:16px}
+}
