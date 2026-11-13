@@ -3,7 +3,7 @@
   'use strict';
 
   const LANG_KEY = 'lse320_language';
-  const PLAYER_ID = 'usr_lse320_01';
+  const LOCAL_PLAYER_ID = 'local_standalone';
   const CHAPTER_FILES = [
     'c01_tools','c02_shapes','c03_transformation_editing',
     'c04_color_gradient_appearance','c05_graph_canvas_navigation',
@@ -40,7 +40,13 @@
       scenarioMode:'เลือกเครื่องมือจากสถานการณ์', scenarioInstruction:'อ่านสถานการณ์และเลือกเครื่องมือ Illustrator ที่เหมาะสมที่สุดจาก 4 ตัวเลือก',
       scenarioQuestion:'สถานการณ์', nextQuestion:'ข้อต่อไป', scenarioCorrect:'ถูกต้อง! เลือกเครื่องมือได้เหมาะสมกับสถานการณ์',
       scenarioIncorrect:'ยังไม่ถูกต้อง ลองสังเกตสิ่งที่โจทย์ต้องการทำ', scenarioResult:'ผลภารกิจสถานการณ์',
-      scenarioScore:'ตอบถูก', of:'จาก'
+      scenarioScore:'ตอบถูก', of:'จาก',
+      viewProgress:'ดูความคืบหน้าของฉัน', myProgress:'ความคืบหน้าการเรียนรู้',
+      overallProgress:'ภาพรวมการเรียนรู้', completedChaptersLabel:'บทเรียนที่เรียนครบ',
+      totalAttemptsLabel:'จำนวนรอบที่เล่น', accuracyLabel:'อัตราการตอบถูก',
+      recentActivity:'ประวัติการฝึก', noProgress:'ยังไม่มีข้อมูลการฝึก เริ่มทำภารกิจเพื่อดูความคืบหน้า',
+      signInProgress:'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูข้อมูลความคืบหน้าของคุณ',
+      backHome:'กลับหน้าแรก', loadingProgress:'กำลังโหลดข้อมูลความคืบหน้า...'
     },
     en: {
       progress:'ATELIER · LEARNING STUDIO', chooseLanguage:'Choose your language',
@@ -72,7 +78,13 @@
       scenarioMode:'Choose a tool for a situation', scenarioInstruction:'Read the situation and choose the most suitable Illustrator tool from four options.',
       scenarioQuestion:'Situation', nextQuestion:'Next question', scenarioCorrect:'Correct! That tool fits the situation.',
       scenarioIncorrect:'Not quite. Look carefully at what the task requires.', scenarioResult:'Scenario Mission Results',
-      scenarioScore:'Correct answers', of:'of'
+      scenarioScore:'Correct answers', of:'of',
+      viewProgress:'View my progress', myProgress:'My Learning Progress',
+      overallProgress:'Learning overview', completedChaptersLabel:'Completed chapters',
+      totalAttemptsLabel:'Practice attempts', accuracyLabel:'Answer accuracy',
+      recentActivity:'Practice history', noProgress:'No practice data yet. Complete a mission to see your progress.',
+      signInProgress:'Please sign in as a site member to view your learning progress.',
+      backHome:'Back home', loadingProgress:'Loading your learning progress...'
     }
   };
 
@@ -98,6 +110,9 @@
   let roundPairs = [];
   let matchingRoundsPlayed = 0;
   const sessionCompletedPairIds = {};
+  let resolvedItemIds = {};
+  let savingAnswer = false;
+  let progressRequestSequence = 0;
   let lastChoice = null;
   let scenarioIndex = 0;
   let scenarioPool = [];
@@ -214,18 +229,24 @@
   }
 
   async function loadAllChapters() {
-    const loaded = await Promise.all(CHAPTER_FILES.map(async id => {
-      if (isWixEmbedded) {
+    if (isWixEmbedded) {
+      const loaded = await Promise.all(CHAPTER_FILES.map(async id => {
         try {
-          const cmsChapter = await callWixBackend('getChapterBundle', { chapterId: id });
-          if (cmsChapter?.id && Array.isArray(cmsChapter.items) && Array.isArray(cmsChapter.matching?.pairs)) {
-            return cmsChapter;
-          }
+          const method = previewMode ? 'getChapterBundleForAdmin' : 'getChapterBundle';
+          const cmsChapter = await callWixBackend(method, { chapterId: id });
+          if (cmsChapter?.id && Array.isArray(cmsChapter.items) && Array.isArray(cmsChapter.matching?.pairs)) return cmsChapter;
           throw new Error('INVALID_CMS_CHAPTER_BUNDLE');
         } catch (error) {
-          console.info('[ATELIER] Using bundled chapter data for', id, error?.message || error);
+          const message = error?.message || 'WIX_CONTENT_ERROR';
+          if (!previewMode && message.includes('CHAPTER_NOT_PUBLISHED')) return null;
+          throw error;
         }
-      }
+      }));
+      chapters = loaded.filter(ch => ch && ch.status !== 'archived').sort((a,b) => a.order-b.order);
+      if (!previewMode && !chapters.length) throw new Error('NO_PUBLISHED_CHAPTERS');
+      return;
+    }
+    const loaded = await Promise.all(CHAPTER_FILES.map(async id => {
       const res = await fetch(`data/${id}.json`);
       if (!res.ok) throw new Error(`Could not load ${id}`);
       return res.json();
@@ -250,6 +271,7 @@
     else if (screen === 'scenarioResult') renderScenarioResult();
     else if (screen === 'matching') renderMatching();
     else if (screen === 'result') renderResult();
+    else if (screen === 'progress') renderProgress();
   }
 
   function setScreen(name) {
@@ -267,6 +289,7 @@
     if (name === 'scenarioResult') renderScenarioResult();
     if (name === 'matching') renderMatching();
     if (name === 'result') renderResult();
+    if (name === 'progress') renderProgress();
   }
 
   function renderLanguage() {
@@ -299,11 +322,13 @@
           <p class="lead">${t('homeText')}</p>
           <div class="home-rule"></div>
           <button class="primary-button" id="start-button">${t('start')} <span aria-hidden="true">→</span></button>
+          <button class="text-button" id="progress-button">${t('viewProgress')}</button>
           <button class="text-button" id="home-language">${t('changeLanguage')}</button>
           <div class="home-page-index"><span>01</span><i></i><span>THE ATELIER</span></div>
         </div>
       </section>`;
     document.getElementById('start-button').onclick = () => setScreen('chapters');
+    document.getElementById('progress-button').onclick = () => setScreen('progress');
     document.getElementById('home-language').onclick = () => setScreen('language');
   }
 
@@ -311,12 +336,11 @@
     const bank = ch.matching?.pairs || [];
     const ids = bank.map(pair => pair.id);
     if (!ids.length) return { completed:0, total:0, percent:0, remaining:0, done:false };
-    const localCompletedIds = (!previewMode && typeof recordAdapter !== 'undefined')
-      ? recordAdapter.getChapterProgress(PLAYER_ID, ch.id, ids).completedPairIds
-      : (sessionCompletedPairIds[ch.id] || []);
-    const remoteCompletedIds = (!previewMode && remoteProgressCache[ch.id]?.completedPairIds)
-      ? remoteProgressCache[ch.id].completedPairIds
-      : [];
+    const localCompletedIds = (!isWixEmbedded && !previewMode && typeof recordAdapter !== 'undefined')
+      ? recordAdapter.getChapterProgress(LOCAL_PLAYER_ID, ch.id, ids).completedPairIds
+      : (previewMode ? (sessionCompletedPairIds[ch.id] || []) : []);
+    const remoteCompletedIds = (isWixEmbedded && !previewMode && remoteProgressCache[ch.id]?.completedPairIds)
+      ? remoteProgressCache[ch.id].completedPairIds : [];
     const completedIds = [...new Set([...localCompletedIds, ...remoteCompletedIds])];
     const completed = ids.filter(id => completedIds.includes(id)).length;
     return { completed, total:ids.length, percent:Math.round(completed/ids.length*100), remaining:ids.length-completed, done:completed===ids.length };
@@ -338,10 +362,11 @@
             </span>
           </button>`;
         }).join('')}</div>
-        <div class="page-actions"><button class="secondary-button" id="home-back">${t('startOver')}</button><button class="text-button" id="chapter-language">${t('changeLanguage')}</button></div>
+        <div class="page-actions"><button class="secondary-button" id="home-back">${t('startOver')}</button><button class="text-button" id="chapters-progress-button">${t('viewProgress')}</button><button class="text-button" id="chapter-language">${t('changeLanguage')}</button></div>
       </section>`;
     app.querySelectorAll('[data-chapter]').forEach(btn => btn.onclick = () => openChapter(btn.dataset.chapter));
     document.getElementById('home-back').onclick = () => setScreen('home');
+    document.getElementById('chapters-progress-button').onclick = () => setScreen('progress');
     document.getElementById('chapter-language').onclick = () => setScreen('language');
   }
   function openChapter(id) {
@@ -349,12 +374,11 @@
     if (!activeChapter) { app.innerHTML = `<section class="content-shell"><h2>${t('missing')}</h2></section>`; return; }
     stats = freshStats(); pairAttempts = {}; matchedIds = new Set(); revealedIds = new Set(); selectedToolId = null; lastFeedback = null; matchingRoundsPlayed = 0;
     lastChoice = null; scenarioIndex = 0; scenarioCorrect = 0; scenarioWrong = 0;
-    roundPairs = []; // Select the five-question round only when the learner starts Matching.
+    roundPairs = [];
+    resolvedItemIds = {};
+    attemptId = null;
+    savingAnswer = false;
     attemptStartedAt = Date.now();
-    if (!previewMode && typeof recordAdapter !== 'undefined') {
-      attemptId = recordAdapter.startAttempt(PLAYER_ID, activeChapter.id, activeChapter.contentVersion || 1);
-      sendRemoteAttemptStart();
-    } else attemptId = 'preview_attempt';
     setScreen('intro');
   }
 
@@ -444,26 +468,43 @@
   }
 
   function renderActivity() {
-    app.innerHTML = `
+    app.innerHTML = \`
       <section class="content-shell narrow-shell">
-        <div class="breadcrumb"><button class="text-button" id="activity-back">← ${t('back')}</button><span>/</span><span>${esc(localized(activeChapter.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">${t('chapter')} ${String(activeChapter.order).padStart(2,'0')}</div><h1>${t('chooseActivity')}</h1></div>
+        <div class="breadcrumb"><button class="text-button" id="activity-back">← \${t('back')}</button><span>/</span><span>\${esc(localized(activeChapter.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">\${t('chapter')} \${String(activeChapter.order).padStart(2,'0')}</div><h1>\${t('chooseActivity')}</h1></div>
         <div class="activity-choice-grid">
-          <button class="activity-choice" id="choose-matching"><span class="activity-number">01</span><strong>${t('matchingMode')}</strong><small>${t('roundNotice')}</small><span class="activity-arrow">→</span></button>
-          <button class="activity-choice" id="choose-scenario"><span class="activity-number">02</span><strong>${t('scenarioMode')}</strong><small>${t('scenarioInstruction')}</small><span class="activity-arrow">→</span></button>
+          <button class="activity-choice" id="choose-matching"><span class="activity-number">01</span><strong>\${t('matchingMode')}</strong><small>\${t('roundNotice')}</small><span class="activity-arrow">→</span></button>
+          <button class="activity-choice" id="choose-scenario"><span class="activity-number">02</span><strong>\${t('scenarioMode')}</strong><small>\${t('scenarioInstruction')}</small><span class="activity-arrow">→</span></button>
         </div>
-      </section>`;
+      </section>\`;
     document.getElementById('activity-back').onclick=()=>setScreen('review');
     document.getElementById('choose-matching').onclick=()=>beginMatchingRound();
-    document.getElementById('choose-scenario').onclick=()=>{
-      if (activeChapter.id === 'c06_essential_shortcuts') {
-        beginKeyboardRound();
-        return;
+    document.getElementById('choose-scenario').onclick=()=>activeChapter.id==='c06_essential_shortcuts'?beginKeyboardRound():beginScenarioRound();
+  }
+
+  async function beginScenarioRound() {
+    scenarioIndex=0;scenarioCorrect=0;scenarioWrong=0;scenarioAttempts={};scenarioOptions={};scenarioResolved={};
+    try {
+      if(isWixEmbedded) {
+        const method=previewMode?'getScenarioBundleForAdmin':'getScenarioBundle';
+        const bundle=await callWixBackend(method,{chapterId:activeChapter.id});
+        scenarioPool=bundle.questions||[];
+      } else {
+        scenarioPool=shuffle(buildScenarioPool()).slice(0,Math.min(5,buildScenarioPool().length));
       }
-      scenarioIndex=0;scenarioCorrect=0;scenarioWrong=0;scenarioAttempts={};scenarioOptions={};scenarioResolved={};
-      const scenarioBank=buildScenarioPool();scenarioPool=shuffle(scenarioBank).slice(0,Math.min(5,scenarioBank.length));
+      if(!scenarioPool.length)throw new Error('NO_SCENARIO_QUESTIONS');
+      if(isWixEmbedded&&!previewMode) {
+        const started=await callWixBackend('startAttempt',{chapterId:activeChapter.id,mode:'scenario'});
+        attemptId=started.attemptId;
+      } else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined') {
+        attemptId=recordAdapter.startAttempt(LOCAL_PLAYER_ID,activeChapter.id,activeChapter.contentVersion||1);
+      } else attemptId='preview_attempt';
+      attemptStartedAt=Date.now();
       setScreen('scenario');
-    };
+    } catch(error) {
+      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'SCENARIO_START_FAILED')}</p><button class="secondary-button" id="scenario-start-back">\${t('back')}</button></section>\`;
+      document.getElementById('scenario-start-back').onclick=()=>setScreen('activity');
+    }
   }
 
   function buildScenarioPool() {
@@ -637,97 +678,144 @@
     </svg>`;
   }
 
-  function renderScenario() {
+  async function renderScenario() {
     const pool=scenarioPool;
-    if(scenarioIndex>=pool.length){setScreen('scenarioResult');return;}
-    const q=pool[scenarioIndex], correctItem=activeChapter.items.find(x=>x.id===q.itemId);
-    if(!scenarioOptions[q.itemId]) scenarioOptions[q.itemId]=shuffle([correctItem,...shuffle(activeChapter.items.filter(x=>x.id!==q.itemId)).slice(0,3)]).map(x=>x.id);
-    const options=scenarioOptions[q.itemId].map(id=>activeChapter.items.find(x=>x.id===id)).filter(Boolean);
-    const used=scenarioAttempts[q.itemId]||0;
-    app.innerHTML=`
+    if(scenarioIndex>=pool.length) {
+      await finishCurrentAttempt();
+      setScreen('scenarioResult');
+      return;
+    }
+    const q=pool[scenarioIndex];
+    const correctItem=q.answerItemId||q.itemId
+      ? activeChapter.items.find(x=>x.id===(q.answerItemId||q.itemId)) : null;
+    let optionIds=Array.isArray(q.options)?q.options:null;
+    if(!optionIds) {
+      if(!scenarioOptions[q.itemId])scenarioOptions[q.itemId]=shuffle([q.itemId,...shuffle(activeChapter.items.filter(x=>x.id!==q.itemId)).slice(0,3).map(x=>x.id)]);
+      optionIds=scenarioOptions[q.itemId];
+    }
+    const options=optionIds.map(id=>activeChapter.items.find(x=>x.id===id)).filter(Boolean);
+    const used=scenarioAttempts[q.scenarioId||q.itemId]||0;
+    app.innerHTML=\`
       <section class="content-shell narrow-shell">
-        <div class="breadcrumb"><button class="text-button" id="scenario-exit">← ${t('chapters')}</button><span>/</span><span>${esc(localized(activeChapter.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">${t('scenarioMode')}</div><h1>${t('scenarioQuestion')} ${scenarioIndex+1}/${pool.length}</h1><p>${t('scenarioInstruction')}</p></div>
+        <div class="breadcrumb"><button class="text-button" id="scenario-exit">← \${t('chapters')}</button><span>/</span><span>\${esc(localized(activeChapter.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">\${t('scenarioMode')}</div><h1>\${t('scenarioQuestion')} \${scenarioIndex+1}/\${pool.length}</h1><p>\${t('scenarioInstruction')}</p></div>
         <article class="scenario-card">
-          <div class="scenario-visual"><div class="scenario-artboard">${scenarioArtwork(q.visual)}</div><span class="scenario-visual-caption">THE FASHION ATELIER · TASK ${String(scenarioIndex+1).padStart(2,'0')}</span></div>
-          <p class="scenario-prompt">${esc(localized(q.prompt))}</p>
+          <div class="scenario-visual"><div class="scenario-artboard">\${scenarioArtwork(q.visual||'default')}</div><span class="scenario-visual-caption">THE FASHION ATELIER · TASK \${String(scenarioIndex+1).padStart(2,'0')}</span></div>
+          <p class="scenario-prompt">\${esc(localized(q.prompt))}</p>
         </article>
-        <div class="scenario-options">${options.map(item=>`<button class="scenario-option" data-option="${esc(item.id)}">${toolIcon(item)}<span><strong>${esc(localized(item.name))}</strong><small>${item.shortcut?esc(item.shortcut):t('noShortcut')}</small></span></button>`).join('')}</div>
-        <div id="scenario-feedback" class="match-feedback" aria-live="polite" ${used?'':'hidden'}>${used?`<strong>${t('incorrect')}</strong> ${esc(lang==='th'?`ลองอีกครั้ง · เหลือ ${Math.max(0,3-used)} ครั้ง`:`Try again · ${Math.max(0,3-used)} attempts left`)}`:''}</div>
-      </section>`;
+        <div class="scenario-options">\${options.map(item=>\`<button class="scenario-option" data-option="\${esc(item.id)}">\${toolIcon(item)}<span><strong>\${esc(localized(item.name))}</strong><small>\${item.shortcut?esc(item.shortcut):t('noShortcut')}</small></span></button>\`).join('')}</div>
+        <div id="scenario-feedback" class="match-feedback" aria-live="polite" \${used?'':'hidden'}></div>
+      </section>\`;
     document.getElementById('scenario-exit').onclick=()=>setScreen('chapters');
     app.querySelectorAll('[data-option]').forEach(btn=>btn.onclick=()=>answerScenario(btn,q,correctItem));
   }
 
-  function answerScenario(btn,q,correctItem) {
-    if (btn.disabled || scenarioResolved[q.itemId]) return;
-
-    const feedback = document.getElementById('scenario-feedback');
-    const isCorrect = btn.dataset.option === q.itemId;
-
-    if (isCorrect) {
-      scenarioAttempts[q.itemId] = scenarioAttempts[q.itemId] || 0;
-      scenarioCorrect++;
-      scenarioResolved[q.itemId] = true;
-      app.querySelectorAll('.scenario-option').forEach(option => {
-        option.disabled = true;
-        if (option.dataset.option === q.itemId) option.classList.add('is-correct');
-      });
-      feedback.hidden = false;
-      feedback.classList.remove('feedback-wrong');
-      feedback.classList.add('feedback-correct');
-      feedback.innerHTML = `<strong>${t('scenarioCorrect')}</strong><br>${esc(localized(correctItem.feedbackCorrect || correctItem.description))}<button class="primary-button scenario-next" id="scenario-next">${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>`;
-      document.getElementById('scenario-next').onclick = () => { scenarioIndex++; renderScenario(); };
+  async function answerScenario(btn,q,previewCorrectItem) {
+    const scenarioId=q.scenarioId||q.itemId;
+    if(btn.disabled||scenarioResolved[scenarioId]||savingAnswer)return;
+    savingAnswer=true;
+    const feedback=document.getElementById('scenario-feedback');
+    let result=null,correct=false,revealed=false,attemptNum=(scenarioAttempts[scenarioId]||0)+1,attemptsLeft=3-attemptNum;
+    try{
+      if(isWixEmbedded&&!previewMode){
+        result=await callWixBackend('recordScenarioAnswer',{
+          attemptId,chapterId:activeChapter.id,scenarioId,selectedItemId:btn.dataset.option,
+          timeSpentMs:Math.max(0,Date.now()-attemptStartedAt)
+        });
+        correct=result.isCorrect===true;
+        revealed=result.isRevealed===true;
+        attemptNum=result.attemptNum;
+        attemptsLeft=result.attemptsLeft;
+      }else if(isWixEmbedded&&previewMode){
+        correct=btn.dataset.option===(q.answerItemId||'');
+        revealed=!correct&&attemptNum>=3;
+      }else{
+        correct=btn.dataset.option===q.itemId;
+        revealed=!correct&&attemptNum>=3;
+        if(typeof recordAdapter!=='undefined'&&!previewMode){
+          recordAdapter.recordAnswer(attemptId,'scenario_'+scenarioId,btn.dataset.option,correct,attemptNum,0,revealed);
+        }
+      }
+    }catch(error){
+      savingAnswer=false;
+      feedback.hidden=false;feedback.innerHTML=\`<strong>\${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>\${esc(error?.message||'SCENARIO_SAVE_FAILED')}\`;
       return;
     }
-
-    // Count incorrect selections only. The correct answer is never highlighted
-    // or named until the learner has made three incorrect attempts.
-    scenarioAttempts[q.itemId] = (scenarioAttempts[q.itemId] || 0) + 1;
-    scenarioWrong++;
-    const wrongCount = scenarioAttempts[q.itemId];
-    btn.disabled = true;
-    btn.classList.add('is-wrong');
-    feedback.hidden = false;
-    feedback.classList.remove('feedback-correct');
-    feedback.classList.add('feedback-wrong');
-
-    if (wrongCount < 3) {
-      const remaining = 3 - wrongCount;
-      feedback.innerHTML = `<strong>${t('scenarioIncorrect')}</strong><br>${esc(lang==='th' ? `ตัวเลือกนี้ไม่ถูกต้อง คุณยังเลือกตัวเลือกอื่นได้อีก ${remaining} ครั้ง ระบบยังไม่เฉลย` : `That choice is incorrect. You have ${remaining} more attempt(s). The answer is still hidden.`)}`;
-      return;
-    }
-
-    scenarioResolved[q.itemId] = true;
-    app.querySelectorAll('.scenario-option').forEach(option => {
-      option.disabled = true;
-      if (option.dataset.option === q.itemId) option.classList.add('is-correct');
+    scenarioAttempts[scenarioId]=attemptNum;
+    if(correct)scenarioCorrect++;
+    else scenarioWrong++;
+    if(correct||revealed)scenarioResolved[scenarioId]=true;
+    const answerId=result?.feedback?.matchedItem?.id||q.answerItemId||q.itemId;
+    const item=answerId?activeChapter.items.find(x=>x.id===answerId):previewCorrectItem;
+    const label=item?localized(item.name):'';
+    app.querySelectorAll('.scenario-option').forEach(option=>{
+      if(correct||revealed) {
+        option.disabled=true;
+        if(option.dataset.option===answerId)option.classList.add('is-correct');
+      } else if(option===btn) {
+        option.disabled=true;option.classList.add('is-wrong');
+      }
     });
-    feedback.innerHTML = `<strong>${t('revealed')}: ${esc(localized(correctItem.name))}</strong><br>${esc(localized(correctItem.feedbackCorrect || correctItem.description))}<button class="primary-button scenario-next" id="scenario-next">${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>`;
-    document.getElementById('scenario-next').onclick = () => { scenarioIndex++; renderScenario(); };
+    feedback.hidden=false;
+    feedback.classList.toggle('feedback-correct',correct);
+    feedback.classList.toggle('feedback-wrong',!correct);
+    if(correct){
+      const detail=result?.feedback?.correct||item?.feedbackCorrect||item?.description||'';
+      feedback.innerHTML=\`<strong>\${t('scenarioCorrect')}</strong><br>\${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">\${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>\`;
+    }else if(revealed){
+      const detail=result?.feedback?.correct||item?.feedbackCorrect||item?.description||'';
+      feedback.innerHTML=\`<strong>\${t('revealed')}: \${esc(label)}</strong><br>\${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">\${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>\`;
+    }else{
+      feedback.innerHTML=\`<strong>\${t('scenarioIncorrect')}</strong><br>\${esc(localized(result?.feedback?.incorrect||''))}<br><span>\${lang==='th'?\`เหลือโอกาสอีก \${attemptsLeft} ครั้ง ระบบยังไม่เฉลย\`:\`\${attemptsLeft} attempt(s) remaining. The answer is still hidden.\`}</span>\`;
+    }
+    if(correct||revealed){
+      document.getElementById('scenario-next').onclick=()=>{scenarioIndex++;renderScenario();};
+    }
+    savingAnswer=false;
   }
 
+  async function finishCurrentAttempt() {
+    if(previewMode||!attemptId)return null;
+    if(isWixEmbedded){
+      const result=await callWixBackend('completeAttempt',{attemptId});
+      if(activeChapter) {
+        try{remoteProgressCache[activeChapter.id]=await callWixBackend('getChapterProgress',{chapterId:activeChapter.id});}catch(_){}
+      }
+      return result;
+    }
+    if(typeof recordAdapter!=='undefined')recordAdapter.completeAttempt(attemptId,stats);
+    return null;
+  }
 
   // Chapter 06: interactive shortcut practice. Only shortcuts explicitly
   // present in the supplied chapter content are used; unverified entries stay in review.
-  function beginKeyboardRound() {
-    const mac = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
-    const mod = mac ? 'Meta' : 'Control';
-    const modLabel = mac ? '⌘ Command' : 'Ctrl';
+  async function beginKeyboardRound() {
     const definitions = [
-      {id:'copy', itemId:'shortcut_copy_paste_cut', key:'C', prompt:{th:'ต้องการคัดลอกวัตถุที่เลือก เพื่อเก็บต้นฉบับไว้และนำสำเนาไปใช้ต่อ ควรกดคีย์ลัดใด?',en:'You want to copy the selected object while keeping the original. Which shortcut should you press?'}, keys:[mod,'C'], label:`${modLabel} + C`, explanation:{th:'ใช้คัดลอกวัตถุหรือข้อความที่เลือก โดยเก็บต้นฉบับไว้ในตำแหน่งเดิม สามารถนำสำเนาไปวางในตำแหน่งอื่นได้',en:'Copies the selected object or text while keeping the original in place. You can paste the copy elsewhere.'}},
-      {id:'paste', itemId:'shortcut_copy_paste_cut', key:'V', prompt:{th:'หลังจากคัดลอกวัตถุแล้ว ต้องการวางสำเนาลงในงาน ควรกดคีย์ลัดใด?',en:'After copying an object, you want to paste the duplicate into your artwork. Which shortcut should you press?'}, keys:[mod,'V'], label:`${modLabel} + V`, explanation:{th:'ใช้วางวัตถุหรือข้อความที่คัดลอกหรือตัดไว้ลงในเอกสาร',en:'Pastes the object or text that you copied or cut into the document.'}},
-      {id:'cut', itemId:'shortcut_copy_paste_cut', key:'X', prompt:{th:'ต้องการตัดวัตถุที่เลือกออกจากตำแหน่งเดิม เพื่อนำไปวางที่อื่น ควรกดคีย์ลัดใด?',en:'You want to cut the selected object from its current position so you can paste it elsewhere. Which shortcut should you press?'}, keys:[mod,'X'], label:`${modLabel} + X`, explanation:{th:'ใช้ตัดวัตถุหรือข้อความที่เลือกออกจากตำแหน่งเดิม เพื่อย้ายไปวางตำแหน่งอื่น',en:'Cuts the selected object or text from its current position so it can be pasted elsewhere.'}},
-      {id:'undo', itemId:'shortcut_undo_redo', key:'Z', prompt:{th:'คุณเพิ่งทำการแก้ไขผิดพลาด และต้องการย้อนกลับการกระทำล่าสุด ควรกดคีย์ลัดใด?',en:'You made an unwanted edit and want to undo the most recent action. Which shortcut should you press?'}, keys:[mod,'Z'], label:`${modLabel} + Z`, explanation:{th:'ใช้ย้อนกลับการกระทำล่าสุด เช่น การวาด การย้าย หรือการแก้ไขวัตถุ',en:'Undoes the most recent action, such as drawing, moving, or editing an object.'}},
-      {id:'panels', itemId:'shortcut_panels', key:'Tab', prompt:{th:'ต้องการซ่อนแผงควบคุมทั้งหมดชั่วคราวเพื่อเพิ่มพื้นที่ทำงาน ควรกดปุ่มใด?',en:'You want to temporarily hide all panels to create more workspace. Which key should you press?'}, keys:['Tab'], label:'Tab', explanation:{th:'ใช้ซ่อนหรือแสดงแผงเครื่องมือและแผงควบคุม เพื่อเพิ่มพื้นที่ทำงานบนหน้าจอ',en:'Hides or shows panels to create more workspace on the screen.'}},
-      {id:'selectall', itemId:'shortcut_select_all', key:'A', prompt:{th:'ต้องการเลือกวัตถุทั้งหมดในเอกสารปัจจุบัน ควรกดคีย์ลัดใด?',en:'You want to select all objects in the current document. Which shortcut should you press?'}, keys:[mod,'A'], label:`${modLabel} + A`, explanation:{th:'ใช้เลือกวัตถุทั้งหมดในเอกสารหรือบริบทที่กำลังทำงานอยู่',en:'Selects all objects in the current document or active context.'}},
-      {id:'selection', itemId:'shortcut_tool_switch', key:'V', prompt:{th:'ต้องการเปลี่ยนไปใช้ Selection Tool เพื่อเลือกและย้ายวัตถุทั้งชิ้น ควรกดปุ่มใด?',en:'You want to activate the Selection Tool to select and move an entire object. Which key should you press?'}, keys:['V'], label:'V', explanation:{th:'Selection Tool ใช้เลือกวัตถุทั้งชิ้น เคลื่อนย้าย และปรับขนาดวัตถุ',en:'The Selection Tool selects entire objects so you can move and resize them.'}},
-      {id:'directselection', itemId:'shortcut_tool_switch', key:'A', prompt:{th:'ต้องการเปลี่ยนไปใช้ Direct Selection Tool เพื่อแก้ไข Anchor Point ควรกดปุ่มใด?',en:'You want to activate the Direct Selection Tool to edit anchor points. Which key should you press?'}, keys:['A'], label:'A', explanation:{th:'Direct Selection Tool ใช้เลือกและแก้ไข Anchor Points หรือส่วนของเส้น Path',en:'The Direct Selection Tool selects and edits anchor points or path segments.'}},
-      {id:'pen', itemId:'shortcut_tool_switch', key:'P', prompt:{th:'ต้องการเปลี่ยนไปใช้ Pen Tool เพื่อสร้างเส้น Path ควรกดปุ่มใด?',en:'You want to activate the Pen Tool to create a path. Which key should you press?'}, keys:['P'], label:'P', explanation:{th:'Pen Tool ใช้สร้างเส้น Path โดยกำหนด Anchor Points เพื่อสร้างเส้นตรงและเส้นโค้งอย่างแม่นยำ',en:'The Pen Tool creates paths by placing anchor points to form precise straight and curved segments.'}}
+      {id:'copy',itemId:'shortcut_copy_paste_cut',prompt:{th:'ต้องการคัดลอกวัตถุที่เลือก เพื่อเก็บต้นฉบับไว้และนำสำเนาไปใช้ต่อ ควรกดคีย์ลัดใด?',en:'You want to copy the selected object while keeping the original. Which shortcut should you press?'},explanation:{th:'ใช้คัดลอกวัตถุหรือข้อความที่เลือก โดยเก็บต้นฉบับไว้ในตำแหน่งเดิม',en:'Copies the selected object or text while keeping the original in place.'}},
+      {id:'paste',itemId:'shortcut_copy_paste_cut',prompt:{th:'หลังจากคัดลอกวัตถุแล้ว ต้องการวางสำเนาลงในงาน ควรกดคีย์ลัดใด?',en:'After copying an object, you want to paste the duplicate into your artwork. Which shortcut should you press?'},explanation:{th:'ใช้วางวัตถุหรือข้อความที่คัดลอกหรือตัดไว้ลงในเอกสาร',en:'Pastes the object or text that you copied or cut into the document.'}},
+      {id:'cut',itemId:'shortcut_copy_paste_cut',prompt:{th:'ต้องการตัดวัตถุที่เลือกออกจากตำแหน่งเดิม เพื่อนำไปวางที่อื่น ควรกดคีย์ลัดใด?',en:'You want to cut the selected object from its current position so you can paste it elsewhere. Which shortcut should you press?'},explanation:{th:'ใช้ตัดวัตถุหรือข้อความที่เลือกออกจากตำแหน่งเดิม',en:'Cuts the selected object or text from its current position.'}},
+      {id:'undo',itemId:'shortcut_undo_redo',prompt:{th:'คุณเพิ่งทำการแก้ไขผิดพลาด และต้องการย้อนกลับการกระทำล่าสุด ควรกดคีย์ลัดใด?',en:'You made an unwanted edit and want to undo the most recent action. Which shortcut should you press?'},explanation:{th:'ใช้ย้อนกลับการกระทำล่าสุด เช่น การวาด การย้าย หรือการแก้ไขวัตถุ',en:'Undoes the most recent action.'}},
+      {id:'panels',itemId:'shortcut_panels',prompt:{th:'ต้องการซ่อนแผงควบคุมทั้งหมดชั่วคราวเพื่อเพิ่มพื้นที่ทำงาน ควรกดปุ่มใด?',en:'You want to temporarily hide all panels to create more workspace. Which key should you press?'},explanation:{th:'ใช้ซ่อนหรือแสดงแผงเครื่องมือและแผงควบคุม',en:'Hides or shows panels to create more workspace.'}},
+      {id:'selectall',itemId:'shortcut_select_all',prompt:{th:'ต้องการเลือกวัตถุทั้งหมดในเอกสารปัจจุบัน ควรกดคีย์ลัดใด?',en:'You want to select all objects in the current document. Which shortcut should you press?'},explanation:{th:'ใช้เลือกวัตถุทั้งหมดในเอกสารหรือบริบทที่กำลังทำงานอยู่',en:'Selects all objects in the current document or active context.'}},
+      {id:'selection',itemId:'shortcut_tool_switch',prompt:{th:'ต้องการเปลี่ยนไปใช้ Selection Tool เพื่อเลือกและย้ายวัตถุทั้งชิ้น ควรกดปุ่มใด?',en:'You want to activate the Selection Tool to select and move an entire object. Which key should you press?'},explanation:{th:'Selection Tool ใช้เลือกวัตถุทั้งชิ้น เคลื่อนย้าย และปรับขนาดวัตถุ',en:'The Selection Tool selects entire objects so you can move and resize them.'}},
+      {id:'directselection',itemId:'shortcut_tool_switch',prompt:{th:'ต้องการเปลี่ยนไปใช้ Direct Selection Tool เพื่อแก้ไข Anchor Point ควรกดปุ่มใด?',en:'You want to activate the Direct Selection Tool to edit anchor points. Which key should you press?'},explanation:{th:'Direct Selection Tool ใช้เลือกและแก้ไข Anchor Points หรือส่วนของเส้น Path',en:'The Direct Selection Tool selects and edits anchor points or path segments.'}},
+      {id:'pen',itemId:'shortcut_tool_switch',prompt:{th:'ต้องการเปลี่ยนไปใช้ Pen Tool เพื่อสร้างเส้น Path ควรกดปุ่มใด?',en:'You want to activate the Pen Tool to create a path. Which key should you press?'},explanation:{th:'Pen Tool ใช้สร้างเส้น Path โดยกำหนด Anchor Points',en:'The Pen Tool creates paths by placing anchor points.'}}
     ];
-    keyboardTasks = shuffle(definitions).slice(0,5);
-    keyboardIndex=0; keyboardWrong=0; keyboardAttempts={}; keyboardResolved={}; keyboardCorrect=0; virtualModifiers=new Set();
-    setScreen('keyboard');
+    keyboardTasks=shuffle(definitions).slice(0,5);
+    keyboardIndex=0;keyboardWrong=0;keyboardAttempts={};keyboardResolved={};keyboardCorrect=0;virtualModifiers=new Set();
+    try{
+      if(isWixEmbedded&&!previewMode){
+        const started=await callWixBackend('startAttempt',{chapterId:activeChapter.id,mode:'keyboard'});
+        attemptId=started.attemptId;
+      }else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
+        attemptId=recordAdapter.startAttempt(LOCAL_PLAYER_ID,activeChapter.id,activeChapter.contentVersion||1);
+      }else attemptId='preview_attempt';
+      attemptStartedAt=Date.now();
+      setScreen('keyboard');
+    }catch(error){
+      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'KEYBOARD_START_FAILED')}</p><button class="secondary-button" id="keyboard-start-back">\${t('back')}</button></section>\`;
+      document.getElementById('keyboard-start-back').onclick=()=>setScreen('activity');
+    }
   }
 
   function isMacPlatform() {
@@ -829,42 +917,62 @@
     if(keyboardPhysicalHandler) window.removeEventListener('keydown',keyboardPhysicalHandler,true);
     keyboardPhysicalHandler=null;
   }
-  function evaluateKeyboardAnswer(keys) {
-    const task=keyboardTasks[keyboardIndex]; if(!task||keyboardResolved[task.id]) return;
-    const normalized=[...new Set(keys)].sort().join('+');
-    const expected=[...task.keys].sort().join('+');
-    const ok=normalized===expected;
+  async function evaluateKeyboardAnswer(keys) {
+    const task=keyboardTasks[keyboardIndex];
+    if(!task||keyboardResolved[task.id]||savingAnswer)return;
     const feedback=document.getElementById('keyboard-feedback');
-    if(!feedback) return;
-    virtualModifiers=new Set(keys);
-    updateKeyboardPressed();
-    if(ok) {
-      keyboardResolved[task.id]=true; keyboardCorrect++;
-      feedback.hidden=false; feedback.className='match-feedback feedback-correct';
-      feedback.innerHTML=`<strong>${lang==='th'?'ถูกต้อง!':'Correct!'}</strong> <b>${esc(task.label)}</b><br>${esc(localized(task.explanation))}<br><button class="primary-button scenario-next" id="keyboard-next">${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>`;
+    if(!feedback)return;
+    savingAnswer=true;
+    virtualModifiers=new Set(keys);updateKeyboardPressed();
+    let result;
+    try{
+      if(isWixEmbedded&&!previewMode){
+        result=await callWixBackend('recordKeyboardAnswer',{
+          attemptId,chapterId:activeChapter.id,taskKey:task.id,keys,
+          timeSpentMs:Math.max(0,Date.now()-attemptStartedAt)
+        });
+      }else if(isWixEmbedded&&previewMode){
+        result=await callWixBackend('checkKeyboardAnswerForAdmin',{taskKey:task.id,keys});
+        result.attemptNum=(keyboardAttempts[task.id]||0)+1;
+        result.isRevealed=!result.isCorrect&&result.attemptNum>=3;
+      }else{
+        throw new Error('CONNECT_TO_WIX_TO_VALIDATE_SHORTCUTS');
+      }
+    }catch(error){
+      savingAnswer=false;
+      feedback.hidden=false;feedback.className='match-feedback feedback-wrong';
+      feedback.innerHTML=\`<strong>\${lang==='th'?'ตรวจสอบคีย์ลัดไม่ได้':'Could not validate shortcut'}</strong><br>\${esc(error?.message||'KEYBOARD_VALIDATION_FAILED')}\`;
+      return;
+    }
+    const count=result.attemptNum||(keyboardAttempts[task.id]||0)+1;
+    keyboardAttempts[task.id]=count;
+    const ok=result.isCorrect===true,revealed=result.isRevealed===true;
+    if(ok)keyboardCorrect++;else keyboardWrong++;
+    feedback.hidden=false;
+    feedback.className='match-feedback '+(ok?'feedback-correct':'feedback-wrong');
+    if(ok||revealed){
+      keyboardResolved[task.id]=true;
+      const answerLabel=result.feedback?.expectedLabel||'';
+      const explanation=localized(task.explanation);
+      if(ok){
+        feedback.innerHTML=\`<strong>\${lang==='th'?'ถูกต้อง!':'Correct!'}</strong> \${answerLabel?\`<b>\${esc(answerLabel)}</b>\`:''}<br>\${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">\${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>\`;
+      }else{
+        feedback.innerHTML=\`<strong>\${lang==='th'?'ครบ 3 ครั้งแล้ว · เฉลย':'No attempts left · Answer'}</strong> <b>\${esc(answerLabel)}</b><br>\${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">\${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>\`;
+      }
       app.querySelectorAll('[data-key]').forEach(btn=>btn.disabled=true);
       document.getElementById('keyboard-next').onclick=()=>{keyboardIndex++;virtualModifiers.clear();renderKeyboardChallenge();};
-    } else {
-      keyboardAttempts[task.id]=(keyboardAttempts[task.id]||0)+1; keyboardWrong++;
-      const count=keyboardAttempts[task.id];
+    }else{
+      const remaining=result.attemptsLeft??Math.max(0,3-count);
       const pressedLabel=keys.map(keyboardDisplayName).join(' + ');
-      feedback.hidden=false; feedback.className='match-feedback feedback-wrong';
-      if(count<3) {
-        feedback.innerHTML=`<strong>${lang==='th'?'ยังไม่ถูกต้อง ลองอีกครั้ง':'Not quite. Try again'}</strong><br>${lang==='th'?`คุณกด ${esc(pressedLabel)} ซึ่งยังไม่ตรงกับคีย์ลัดของโจทย์`:`You pressed ${esc(pressedLabel)}, which does not match this task.`}<br><span>${lang==='th'?`เหลือโอกาสอีก ${3-count} ครั้ง`:`${3-count} attempt(s) remaining`}</span>`;
-        virtualModifiers.clear();
-        updateKeyboardPressed();
-      } else {
-        keyboardResolved[task.id]=true;
-        feedback.innerHTML=`<strong>${lang==='th'?'ครบ 3 ครั้งแล้ว · เฉลย':'No attempts left · Answer'}</strong> <b>${esc(task.label)}</b><br>${esc(localized(task.explanation))}<br><button class="primary-button scenario-next" id="keyboard-next">${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>`;
-        app.querySelectorAll('[data-key]').forEach(btn=>btn.disabled=true);
-        virtualModifiers.clear(); updateKeyboardPressed();
-        document.getElementById('keyboard-next').onclick=()=>{keyboardIndex++;virtualModifiers.clear();renderKeyboardChallenge();};
-      }
+      feedback.innerHTML=\`<strong>\${lang==='th'?'ยังไม่ถูกต้อง ลองอีกครั้ง':'Not quite. Try again'}</strong><br>\${lang==='th'?\`คุณกด \${esc(pressedLabel)} ซึ่งยังไม่ตรงกับคีย์ลัดของโจทย์\`:\`You pressed \${esc(pressedLabel)}, which does not match this task.\`}<br><span>\${lang==='th'?\`เหลือโอกาสอีก \${remaining} ครั้ง\`:\`\${remaining} attempt(s) remaining\`}</span>\`;
+      virtualModifiers.clear();updateKeyboardPressed();
     }
+    savingAnswer=false;
   }
 
-  function renderKeyboardResult() {
+  async function renderKeyboardResult() {
     detachKeyboardListener();
+    try{await finishCurrentAttempt();}catch(error){console.error('[ATELIER] Keyboard attempt completion failed',error);}
     app.innerHTML=`<section class="welcome-card result-screen"><div class="eyebrow">CHAPTER 06 · KEYBOARD PRACTICE</div><h1>${lang==='th'?'สรุปผลการฝึกคีย์ลัด':'Keyboard Practice Results'}</h1><div class="result-grid"><div class="result-stat"><strong>${keyboardCorrect}/${keyboardTasks.length}</strong><span>${lang==='th'?'ตอบถูก':'Correct'}</span></div><div class="result-stat"><strong>${keyboardWrong}</strong><span>${t('wrongAttempts')}</span></div></div><div class="result-actions"><button class="primary-button" id="keyboard-replay">${t('replay')}</button><button class="secondary-button" id="keyboard-chapters">${t('chapters')}</button></div></section>`;
     document.getElementById('keyboard-replay').onclick=()=>beginKeyboardRound();
     document.getElementById('keyboard-chapters').onclick=()=>setScreen('chapters');
@@ -873,90 +981,79 @@
   function renderScenarioResult() {
     const total=scenarioPool.length;
     app.innerHTML=`<section class="welcome-card result-screen"><div class="eyebrow">${t('scenarioResult')}</div><h1>${t('scenarioResult')}</h1><div class="result-grid"><div class="result-stat"><strong>${scenarioCorrect}/${total}</strong><span>${t('scenarioScore')}</span></div><div class="result-stat"><strong>${scenarioWrong}</strong><span>${t('wrongAttempts')}</span></div></div><div class="result-actions"><button class="primary-button" id="scenario-replay">${t('replay')}</button><button class="secondary-button" id="scenario-chapters">${t('chapters')}</button></div></section>`;
-    document.getElementById('scenario-replay').onclick=()=>{scenarioIndex=0;scenarioCorrect=0;scenarioWrong=0;scenarioAttempts={};scenarioOptions={};scenarioResolved={};const scenarioBank=buildScenarioPool();scenarioPool=shuffle(scenarioBank).slice(0,Math.min(5,scenarioBank.length));setScreen('scenario');};
+    document.getElementById('scenario-replay').onclick=()=>beginScenarioRound();
     document.getElementById('scenario-chapters').onclick=()=>setScreen('chapters');
   }
 
-  function beginMatchingRound() {
-    const bank = (activeChapter?.matching?.pairs || []).filter(pair =>
-      activeChapter.items.some(item => item.id === pair.itemId)
-    );
-    const completedIds = (!previewMode && typeof recordAdapter !== 'undefined')
-      ? recordAdapter.getChapterProgress(PLAYER_ID, activeChapter.id, bank.map(p => p.id)).completedPairIds
-      : (sessionCompletedPairIds[activeChapter.id] || []);
-    const remainingBank = bank.filter(pair => !completedIds.includes(pair.id));
-    if (!remainingBank.length) {
-      roundPairs = [];
-      setScreen('result');
-      return;
+  async function beginMatchingRound() {
+    const bank=(activeChapter?.matching?.pairs||[]).filter(pair=>pair&&pair.id&&(!pair.itemId||activeChapter.items.some(item=>item.id===pair.itemId)));
+    const completedIds=isWixEmbedded&&!previewMode
+      ?(remoteProgressCache[activeChapter.id]?.completedPairIds||[])
+      :(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'
+        ?recordAdapter.getChapterProgress(LOCAL_PLAYER_ID,activeChapter.id,bank.map(p=>p.id)).completedPairIds
+        :(sessionCompletedPairIds[activeChapter.id]||[]));
+    const remaining=bank.filter(pair=>!completedIds.includes(pair.id));
+    if(!remaining.length){roundPairs=[];setScreen('result');return;}
+    roundPairs=shuffle(remaining).slice(0,Math.min(5,remaining.length));
+    pairAttempts={};roundPairs.forEach(pair=>{pairAttempts[pair.id]=0;});
+    matchedIds=new Set();revealedIds=new Set();resolvedItemIds={};selectedToolId=null;
+    lastChoice=null;lastFeedback=null;stats=freshStats();pairStart=Date.now();attemptStartedAt=Date.now();savingAnswer=false;
+    try{
+      if(isWixEmbedded&&!previewMode){
+        const started=await callWixBackend('startAttempt',{chapterId:activeChapter.id,mode:'matching'});
+        attemptId=started.attemptId;
+      }else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
+        attemptId=recordAdapter.startAttempt(LOCAL_PLAYER_ID,activeChapter.id,activeChapter.contentVersion||1);
+      }else attemptId='preview_attempt';
+      matchingRoundsPlayed++;setScreen('matching');
+    }catch(error){
+      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'ATTEMPT_START_FAILED')}</p><button class="secondary-button" id="attempt-start-back">\${t('back')}</button></section>\`;
+      document.getElementById('attempt-start-back').onclick=()=>setScreen('activity');
     }
-    roundPairs = shuffle(remainingBank).slice(0, Math.min(5, remainingBank.length));
-    pairAttempts = {};
-    roundPairs.forEach(pair => { pairAttempts[pair.itemId] = 0; });
-    matchedIds = new Set();
-    revealedIds = new Set();
-    selectedToolId = null;
-    lastChoice = null;
-    lastFeedback = null;
-    stats = freshStats();
-    pairStart = Date.now();
-    if (matchingRoundsPlayed > 0 && !previewMode && typeof recordAdapter !== 'undefined') {
-      attemptId = recordAdapter.startAttempt(PLAYER_ID, activeChapter.id, activeChapter.contentVersion || 1);
-      sendRemoteAttemptStart();
-    }
-    attemptStartedAt = Date.now();
-    matchingRoundsPlayed++;
-    setScreen('matching');
   }
 
   function renderMatching() {
-    const ch = activeChapter;
-    const pairs = roundPairs;
-    const toolItems = ch.items.filter(item => pairs.some(pair => pair.itemId === item.id));
-    if (!pairs.length) {
-      app.innerHTML = `<section class="content-shell"><h1>${t('loadError')}</h1><p>No matching pairs are available for this chapter.</p><button class="secondary-button" id="matching-empty-back">${t('back')}</button></section>`;
-      document.getElementById('matching-empty-back').onclick=()=>setScreen('activity');
-      return;
-    }
-    if (!Object.keys(pairAttempts).length) pairs.forEach(p => pairAttempts[p.itemId] = 0);
-    const roundIds = new Set(pairs.map(pair => pair.itemId));
-    const toolOrder = shuffle(toolItems.filter(item => roundIds.has(item.id) && !matchedIds.has(item.id) && !revealedIds.has(item.id)));
-    const promptOrder = shuffle(pairs.filter(p => !matchedIds.has(p.itemId) && !revealedIds.has(p.itemId)));
-    app.innerHTML = `
+    const ch=activeChapter,pairs=roundPairs;
+    const toolItems=ch.items;
+    if(!pairs.length){app.innerHTML=\`<section class="content-shell"><h1>\${t('loadError')}</h1><p>No matching pairs are available for this chapter.</p><button class="secondary-button" id="matching-empty-back">\${t('back')}</button></section>\`;document.getElementById('matching-empty-back').onclick=()=>setScreen('activity');return;}
+    const used=new Set(Object.values(resolvedItemIds).filter(Boolean));
+    const toolOrder=shuffle(toolItems.filter(item=>!used.has(item.id)));
+    const promptOrder=shuffle(pairs.filter(pair=>!matchedIds.has(pair.id)&&!revealedIds.has(pair.id)));
+    app.innerHTML=\`
       <section class="content-shell">
-        <div class="breadcrumb"><button class="text-button" id="matching-back">← ${t('back')}</button><span>/</span><span>${esc(localized(ch.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">${t('chapter')} ${String(ch.order).padStart(2,'0')} · ${t('matchingIntro')}</div><h1>${t('matchingIntro')}</h1><p>${t('matchingInstruction')}</p></div>
+        <div class="breadcrumb"><button class="text-button" id="matching-back">← \${t('back')}</button><span>/</span><span>\${esc(localized(ch.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">\${t('chapter')} \${String(ch.order).padStart(2,'0')} · \${t('matchingIntro')}</div><h1>\${t('matchingIntro')}</h1><p>\${t('matchingInstruction')}</p></div>
         <div class="matching-dashboard">
-          <div class="matching-dashboard-top"><div><span class="eyebrow">${t('chapterProgress')}</span><strong>${esc(localized(ch.title))}</strong></div><span class="matching-round-label">${t('roundComplete')} · ${pairs.length} ${t('item')}</span></div>
-          <div class="matching-progress"><span>${t('completed')}: ${matchedIds.size + revealedIds.size}/${pairs.length}</span><div class="progress-track"><i style="width:${((matchedIds.size+revealedIds.size)/pairs.length)*100}%"></i></div></div>
-          <div class="matching-bank-progress"><span>${t('chapterProgress')}</span><strong>${chapterProgress(ch).percent}%</strong><div class="progress-track"><i style="width:${chapterProgress(ch).percent}%"></i></div><small>${chapterProgress(ch).completed}/${chapterProgress(ch).total} · ${chapterProgress(ch).remaining} ${t('remaining')}</small></div>
+          <div class="matching-dashboard-top"><div><span class="eyebrow">\${t('chapterProgress')}</span><strong>\${esc(localized(ch.title))}</strong></div><span class="matching-round-label">\${t('roundComplete')} · \${pairs.length} \${t('item')}</span></div>
+          <div class="matching-progress"><span>\${t('completed')}: \${matchedIds.size+revealedIds.size}/\${pairs.length}</span><div class="progress-track"><i style="width:\${((matchedIds.size+revealedIds.size)/pairs.length)*100}%"></i></div></div>
+          <div class="matching-bank-progress"><span>\${t('chapterProgress')}</span><strong>\${chapterProgress(ch).percent}%</strong><div class="progress-track"><i style="width:\${chapterProgress(ch).percent}%"></i></div><small>\${chapterProgress(ch).completed}/\${chapterProgress(ch).total} · \${chapterProgress(ch).remaining} \${t('remaining')}</small></div>
         </div>
         <div class="matching-columns">
-          <div class="matching-column"><h2>${t('tools')}</h2><div class="match-list" id="tool-list">
-            ${toolOrder.map(item=>`<button class="match-tool ${lastChoice && !lastChoice.correct && lastChoice.toolId===item.id ? 'is-wrong' : ''}" draggable="true" data-tool="${esc(item.id)}">${toolIcon(item)}<span class="match-tool-copy"><strong>${esc(localized(item.name))}</strong>${item.shortcut?`<small>${esc(item.shortcut)}</small>`:''}</span></button>`).join('')}
+          <div class="matching-column"><h2>\${t('tools')}</h2><div class="match-list" id="tool-list">
+            \${toolOrder.map(item=>\`<button class="match-tool \${lastChoice&&!lastChoice.correct&&lastChoice.toolId===item.id?'is-wrong':''}" draggable="true" data-tool="\${esc(item.id)}">\${toolIcon(item)}<span class="match-tool-copy"><strong>\${esc(localized(item.name))}</strong>\${item.shortcut?\`<small>\${esc(item.shortcut)}</small>\`:''}</span></button>\`).join('')}
           </div></div>
-          <div class="matching-column"><h2>${t('functions')}</h2><div class="match-list" id="prompt-list">
-            ${promptOrder.map(pair=>{
-              const item=toolItems.find(x=>x.id===pair.itemId);
-              return `<button class="match-prompt ${lastChoice && !lastChoice.correct && lastChoice.targetId===pair.itemId ? 'is-wrong' : ''}" data-target="${esc(pair.itemId)}" data-pair="${esc(pair.id)}"><span>${esc(localized(item.matchingPrompt))}</span><small>${t('dropHere')}</small></button>`;
+          <div class="matching-column"><h2>\${t('functions')}</h2><div class="match-list" id="prompt-list">
+            \${promptOrder.map(pair=>{
+              const item=pair.itemId?toolItems.find(x=>x.id===pair.itemId):null;
+              const prompt=pair.matchingPrompt?localized(pair.matchingPrompt):localized(item?.matchingPrompt);
+              return \`<button class="match-prompt \${lastChoice&&!lastChoice.correct&&lastChoice.targetId===pair.id?'is-wrong':''}" data-target="\${esc(pair.id)}" data-pair="\${esc(pair.id)}"><span>\${esc(prompt)}</span><small>\${t('dropHere')}</small></button>\`;
             }).join('')}
           </div></div>
         </div>
-        <div id="match-feedback" class="match-feedback" ${lastFeedback?'':'hidden'}>${lastFeedback||''}</div>
-        <div class="page-actions"><button class="secondary-button" id="quit-match">${t('chapters')}</button><button class="primary-button" id="match-results" ${matchedIds.size+revealedIds.size===pairs.length?'':'disabled'}>${t('viewResults')} →</button></div>
-      </section>`;
-    document.getElementById('matching-back').onclick = () => setScreen('review');
-    document.getElementById('quit-match').onclick = () => setScreen('chapters');
-    document.getElementById('match-results').onclick = () => finishChapter();
-
-    app.querySelectorAll('.match-tool').forEach(btn => {
+        <div id="match-feedback" class="match-feedback" \${lastFeedback?'':'hidden'}>\${lastFeedback||''}</div>
+        <div class="page-actions"><button class="secondary-button" id="quit-match">\${t('chapters')}</button><button class="primary-button" id="match-results" \${matchedIds.size+revealedIds.size===pairs.length?'':'disabled'}>\${t('viewResults')} →</button></div>
+      </section>\`;
+    document.getElementById('matching-back').onclick=()=>setScreen('review');
+    document.getElementById('quit-match').onclick=()=>setScreen('chapters');
+    document.getElementById('match-results').onclick=()=>finishChapter();
+    app.querySelectorAll('.match-tool').forEach(btn=>{
       btn.addEventListener('click',()=>selectTool(btn.dataset.tool));
-      btn.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',btn.dataset.tool); });
+      btn.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',btn.dataset.tool);});
     });
-    app.querySelectorAll('.match-prompt').forEach(btn => {
-      btn.addEventListener('click',()=>{ if(selectedToolId) checkMatch(selectedToolId,btn); });
+    app.querySelectorAll('.match-prompt').forEach(btn=>{
+      btn.addEventListener('click',()=>{if(selectedToolId)checkMatch(selectedToolId,btn);});
       btn.addEventListener('dragover',e=>e.preventDefault());
-      btn.addEventListener('drop',e=>{e.preventDefault();const id=e.dataTransfer.getData('text/plain');if(id)checkMatch(id,btn);});
+      btn.addEventListener('drop',e=>{e.preventDefault();const value=e.dataTransfer.getData('text/plain');if(value)checkMatch(value,btn);});
     });
   }
 
@@ -965,102 +1062,73 @@
     app.querySelectorAll('.match-tool').forEach(b=>b.classList.toggle('is-selected',b.dataset.tool===id));
   }
 
-  function checkMatch(selectedId, promptButton) {
-    if (!promptButton || promptButton.disabled) return;
-    const targetId = promptButton.dataset.target;
-    const pairId = promptButton.dataset.pair;
-    const item = activeChapter.items.find(x=>x.id===targetId);
-    const selectedItem = activeChapter.items.find(x=>x.id===selectedId);
-    if (!selectedItem) return;
-    const attemptNum = (pairAttempts[targetId] || 0) + 1;
-    const correct = selectedId === targetId;
-    const timeSpent = Date.now() - pairStart;
-    pairStart = Date.now();
-    let revealed = false;
-    let message = '';
-
-    lastChoice = {toolId:selectedId,targetId,correct};
-    if (correct) {
-      pairAttempts[targetId] = attemptNum;
-      matchedIds.add(targetId);
-      if (attemptNum === 1) stats.firstTimeCorrect++;
-      stats.totalCorrect++;
-      message = `<strong>${t('correct')}</strong> ${esc(localized(item.feedbackCorrect))}`;
-      promptButton.classList.add('is-matched');
-      promptButton.innerHTML = `<strong>${esc(localized(item.name))}</strong><small>${t('matched')}</small>`;
-      promptButton.disabled = true;
-      const toolButton = app.querySelector(`[data-tool="${CSS.escape(targetId)}"]`);
-      if (toolButton) toolButton.remove();
-    } else {
-      pairAttempts[targetId] = attemptNum;
-      stats.totalIncorrectAttempts++;
-      const remaining = activeChapter.matching.maxAttemptsPerPair - attemptNum;
-      if (remaining <= 0) {
-        revealed = true;
-        revealedIds.add(targetId);
-        stats.totalRevealed++;
-        message = `<strong>${t('revealed')}</strong> ${esc(localized(item.name))} — ${esc(localized(item.description))}`;
-        promptButton.classList.add('is-revealed');
-        promptButton.innerHTML = `<strong>${esc(localized(item.name))}</strong><small>${t('revealed')}</small>`;
-        promptButton.disabled = true;
-        const correctTool = app.querySelector(`[data-tool="${CSS.escape(targetId)}"]`);
-        if (correctTool) correctTool.remove();
-      } else {
-        message = `<strong>${t('incorrect')}</strong> ${esc(localized(item.feedbackIncorrect))}<br><small>${t('attemptsLeft')}: ${remaining}</small>`;
+  async function checkMatch(selectedId,promptButton) {
+    if(!promptButton||promptButton.disabled||savingAnswer)return;
+    const pairId=promptButton.dataset.pair,pair=roundPairs.find(p=>p.id===pairId);
+    const selected=activeChapter.items.find(x=>x.id===selectedId);
+    if(!pair||!selected)return;
+    savingAnswer=true;
+    const attemptLocal=(pairAttempts[pairId]||0)+1;
+    const timeSpent=Math.max(0,Date.now()-pairStart);
+    let attemptNum=attemptLocal,correct=false,revealed=false,attemptsLeft=Math.max(0,3-attemptLocal);
+    let matched=pair.itemId?activeChapter.items.find(x=>x.id===pair.itemId):null;
+    let correctFeedback=matched?.feedbackCorrect||matched?.description||'';
+    let incorrectFeedback=matched?.feedbackIncorrect||'';
+    try{
+      if(isWixEmbedded&&!previewMode){
+        const result=await callWixBackend('recordAnswer',{attemptId,chapterId:activeChapter.id,pairId,selectedItemId:selectedId,timeSpentMs:timeSpent});
+        attemptNum=result.attemptNum;correct=result.isCorrect===true;revealed=result.isRevealed===true;attemptsLeft=result.attemptsLeft;
+        matched=result.feedback?.matchedItem||matched;
+        correctFeedback=result.feedback?.correct||correctFeedback;
+        incorrectFeedback=result.feedback?.incorrect||incorrectFeedback;
+        if(result.progress)remoteProgressCache[activeChapter.id]=result.progress;
+      }else{
+        correct=Boolean(pair.itemId&&selectedId===pair.itemId);
+        revealed=!correct&&attemptLocal>=3;
       }
+    }catch(error){
+      savingAnswer=false;lastFeedback=\`<strong>\${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>\${esc(error?.message||'ANSWER_SAVE_FAILED')}\`;
+      renderMatching();const fb=document.getElementById('match-feedback');if(fb)fb.hidden=false;return;
     }
-
-    if (!previewMode && typeof recordAdapter !== 'undefined') {
+    pairAttempts[pairId]=attemptNum;
+    lastChoice={toolId:selectedId,targetId:pairId,correct};
+    if(correct){matchedIds.add(pairId);resolvedItemIds[pairId]=selectedId;if(attemptNum===1)stats.firstTimeCorrect++;stats.totalCorrect++;}
+    else{stats.totalIncorrectAttempts++;if(revealed){revealedIds.add(pairId);resolvedItemIds[pairId]=matched?.id||pair.itemId||'';stats.totalRevealed++;}}
+    if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
       recordAdapter.recordAnswer(attemptId,pairId,selectedId,correct,attemptNum,timeSpent,revealed);
-      queueWixWrite('recordAnswer', {
-        answerId: `ans_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        attemptId,
-        chapterId: activeChapter.id,
-        pairId,
-        selectedItemId: selectedId,
-        attemptNum,
-        isCorrect: correct,
-        isRevealed: revealed,
-        timeSpentMs: timeSpent
-      });
-      if (correct || revealed) {
-        recordAdapter.resolveQuestion(PLAYER_ID, activeChapter.id, pairId, (activeChapter.matching?.pairs || []).length);
-        queueWixWrite('resolveQuestion', {
-          chapterId: activeChapter.id,
-          pairId,
-          totalQuestions: (activeChapter.matching?.pairs || []).length
-        });
-      }
-    } else if (correct || revealed) {
-      sessionCompletedPairIds[activeChapter.id] ||= [];
-      if (!sessionCompletedPairIds[activeChapter.id].includes(pairId)) sessionCompletedPairIds[activeChapter.id].push(pairId);
+      if(correct||revealed)recordAdapter.resolveQuestion(LOCAL_PLAYER_ID,activeChapter.id,pairId,(activeChapter.matching?.pairs||[]).length);
+    }else if(previewMode&&(correct||revealed)){
+      sessionCompletedPairIds[activeChapter.id]||=[];
+      if(!sessionCompletedPairIds[activeChapter.id].includes(pairId))sessionCompletedPairIds[activeChapter.id].push(pairId);
     }
-    selectedToolId = null;
-    lastFeedback = message;
-    renderMatching();
-    const fb = document.getElementById('match-feedback');
-    if (fb) {
-      fb.hidden = false;
-      fb.classList.toggle('feedback-correct', correct);
-      fb.classList.toggle('feedback-wrong', !correct);
-      fb.innerHTML = message;
-    }
-    const resultButton = document.getElementById('match-results');
-    if (matchedIds.size + revealedIds.size === roundPairs.length) resultButton.disabled = false;
+    let message='';
+    if(correct)message=\`<strong>\${t('correct')}</strong> \${esc(localized(correctFeedback))}\`;
+    else if(revealed)message=\`<strong>\${t('revealed')}</strong> \${esc(localized(matched?.name))} — \${esc(localized(matched?.description))}\`;
+    else message=\`<strong>\${t('incorrect')}</strong> \${esc(localized(incorrectFeedback))}<br><small>\${t('attemptsLeft')}: \${attemptsLeft}</small>\`;
+    selectedToolId=null;pairStart=Date.now();lastFeedback=message;savingAnswer=false;renderMatching();
+    const fb=document.getElementById('match-feedback');
+    if(fb){fb.hidden=false;fb.classList.toggle('feedback-correct',correct);fb.classList.toggle('feedback-wrong',!correct);fb.innerHTML=message;}
+    const resultButton=document.getElementById('match-results');
+    if(resultButton&&matchedIds.size+revealedIds.size===roundPairs.length)resultButton.disabled=false;
   }
 
-  function finishChapter() {
-    if (!activeChapter) return;
-    if (!previewMode && typeof recordAdapter !== 'undefined') {
-      recordAdapter.completeAttempt(attemptId,stats);
-      queueWixWrite('completeAttempt', {
-        attemptId,
-        stats: {
-          correctMatches: stats.totalCorrect,
-          totalAttempts: stats.totalCorrect + stats.totalIncorrectAttempts,
-          timeSpentMs: Math.max(0, Date.now() - attemptStartedAt)
-        }
-      });
+  async function finishCurrentAttempt() {
+    if(previewMode||!attemptId)return null;
+    if(isWixEmbedded){
+      const result=await callWixBackend('completeAttempt',{attemptId});
+      if(activeChapter){try{remoteProgressCache[activeChapter.id]=await callWixBackend('getChapterProgress',{chapterId:activeChapter.id});}catch(_){}}
+      return result;
+    }
+    if(typeof recordAdapter!=='undefined')recordAdapter.completeAttempt(attemptId,stats);
+    return null;
+  }
+
+  async function finishChapter() {
+    if(!activeChapter||savingAnswer)return;
+    try{await finishCurrentAttempt();}
+    catch(error){
+      lastFeedback=`<strong>${esc(lang==='th'?'ปิดรอบการเล่นไม่สำเร็จ':'Could not complete attempt')}</strong><br>${esc(error?.message||'ATTEMPT_COMPLETE_FAILED')}`;
+      renderMatching();const fb=document.getElementById('match-feedback');if(fb)fb.hidden=false;return;
     }
     setScreen('result');
   }
@@ -1094,6 +1162,75 @@
     if (complete) document.getElementById('replay').onclick = () => openChapter(activeChapter.id);
     else document.getElementById('next-round').onclick = () => beginMatchingRound();
     document.getElementById('to-chapters').onclick = () => setScreen('chapters');
+  }
+
+  async function renderProgress() {
+    app.innerHTML=\`<section class="content-shell"><div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>\${t('myProgress')}</h1><p>\${t('loadingProgress')}</p></div></section>\`;
+    let data=null,history=[];
+    try{
+      if(isWixEmbedded&&!previewMode){
+        [data,history]=await Promise.all([
+          callWixBackend('getMyProgress'),
+          callWixBackend('getMyGameHistory',{limit:12})
+        ]);
+      }else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
+        const attempts=recordAdapter.getAttemptHistory(LOCAL_PLAYER_ID);
+        history=attempts.slice().reverse().slice(0,12).map(a=>({attemptId:a.id,chapterId:a.chapterId,mode:'matching',status:a.status,startTime:a.startTime,
+          totalQuestions:a.stats?.totalCorrect||0,correctCount:a.stats?.totalCorrect||0,totalAttempts:a.stats?.totalCorrect||0,
+          scorePercent:0,timeSpentMs:0}));
+        data={completedChapterCount:0,totalAttempts:attempts.length,totalAnswers:0,accuracyPercent:0,chapters:chapters.map(ch=>{
+          const ids=(ch.matching?.pairs||[]).map(p=>p.id);
+          const p=recordAdapter.getChapterProgress(LOCAL_PLAYER_ID,ch.id,ids);
+          return {chapterId:ch.id,order:ch.order,title:ch.title,matchingCompleted:p.completedCount,matchingTotal:p.totalQuestions,progressPercent:p.progressPercent,remaining:p.remaining,status:p.status};
+        })};
+      }else if(previewMode){
+        data={completedChapterCount:0,totalAttempts:0,totalAnswers:0,accuracyPercent:0,chapters:[]};
+      }
+    }catch(error){
+      const message=error?.message||'PROGRESS_LOAD_FAILED';
+      const loginRequired=message.includes('MEMBER_LOGIN_REQUIRED');
+      app.innerHTML=\`<section class="content-shell narrow-shell"><div class="section-heading"><h1>\${t('myProgress')}</h1><p>\${esc(loginRequired?t('signInProgress'):message)}</p></div><div class="page-actions"><button class="secondary-button" id="progress-home">\${t('backHome')}</button></div></section>\`;
+      document.getElementById('progress-home').onclick=()=>setScreen('home');
+      return;
+    }
+    const chapterRows=(data?.chapters||[]).slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    const fmtTime=ms=>{
+      const minutes=Math.floor((ms||0)/60000),seconds=Math.floor(((ms||0)%60000)/1000);
+      return minutes?minutes+\`m \`+seconds+\`s\`:seconds+\`s\`;
+    };
+    app.innerHTML=\`
+      <section class="content-shell">
+        <div class="breadcrumb"><button class="text-button" id="progress-home">← \${t('backHome')}</button><span>/</span><span>PROGRESS</span></div>
+        <div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>\${t('myProgress')}</h1><p>\${t('overallProgress')}</p></div>
+        <div class="progress-overview-grid">
+          <article class="result-stat"><strong>\${data?.completedChapterCount||0}/\${chapters.length}</strong><span>\${t('completedChaptersLabel')}</span></article>
+          <article class="result-stat"><strong>\${data?.totalAttempts||0}</strong><span>\${t('totalAttemptsLabel')}</span></article>
+          <article class="result-stat"><strong>\${data?.accuracyPercent||0}%</strong><span>\${t('accuracyLabel')}</span></article>
+        </div>
+        <div class="section-heading progress-subheading"><h2>\${t('chapterProgress')}</h2></div>
+        <div class="progress-chapter-list">
+          \${chapterRows.map(ch=>\`<article class="info-card progress-chapter-card">
+            <div class="chapter-progress-meta"><b>\${String(ch.order||0).padStart(2,'0')} · \${esc(localized(ch.title))}</b><b>\${ch.progressPercent||0}%</b></div>
+            <div class="progress-track"><i style="width:\${ch.progressPercent||0}%"></i></div>
+            <p>\${ch.matchingCompleted||0}/\${ch.matchingTotal||0} · \${ch.remaining||0} \${t('remaining')}</p>
+            <small>\${t('scenarioMode')}: \${ch.scenarioQuestionsResolved||0} · \${lang==='th'?'คีย์ลัด':'Keyboard'}: \${ch.keyboardQuestionsResolved||0}</small>
+          </article>\`).join('')||\`<p class="muted">\${t('noProgress')}</p>\`}
+        </div>
+        <div class="section-heading progress-subheading"><h2>\${t('recentActivity')}</h2></div>
+        <div class="progress-attempt-list">
+          \${history.map(a=>{
+            const chapter=chapters.find(ch=>ch.id===a.chapterId);
+            const mode=a.mode==='keyboard'?(lang==='th'?'ฝึกคีย์ลัด':'Keyboard'):a.mode==='scenario'?t('scenarioMode'):t('matchingMode');
+            const date=a.startTime?new Date(a.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
+            return \`<article class="info-card progress-attempt-card">
+              <div><strong>\${esc(localized(chapter?.title)||a.chapterId)}</strong><small>\${esc(mode)} · \${esc(date)}</small></div>
+              <b>\${a.correctCount||0}/\${a.totalQuestions||0}</b>
+              <small>\${a.scorePercent||0}% · \${fmtTime(a.timeSpentMs||0)}</small>
+            </article>\`;
+          }).join('')||\`<p class="muted">\${t('noProgress')}</p>\`}
+        </div>
+      </section>\`;
+    document.getElementById('progress-home').onclick=()=>setScreen('home');
   }
 
   langButton.addEventListener('click',()=> {
