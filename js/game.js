@@ -217,7 +217,7 @@
           return cmsChapter;
         }));
       } else {
-        loaded = await callWixBackend('getPublishedChapterBundles');
+        loaded = await callWixBackend('getChapterBundle', { chapterId: '__all_published__' });
         if (!Array.isArray(loaded)) throw new Error('INVALID_PUBLISHED_CHAPTER_BUNDLES');
       }
       chapters = loaded.filter(ch => ch && ch.status !== 'archived').sort((a,b) => a.order-b.order);
