@@ -467,7 +467,8 @@
         const bundle=await callWixBackend(method,{chapterId:activeChapter.id});
         scenarioPool=bundle.questions||[];
       } else {
-        scenarioPool=shuffle(buildScenarioPool()).slice(0,Math.min(5,buildScenarioPool().length));
+        const localQuestions=buildScenarioPool();
+        scenarioPool=shuffle(localQuestions).slice(0,Math.min(5,localQuestions.length));
       }
       if(!scenarioPool.length)throw new Error('NO_SCENARIO_QUESTIONS');
       if(isWixEmbedded&&!previewMode) {
