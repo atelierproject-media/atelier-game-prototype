@@ -189,8 +189,16 @@ export const startAttempt=webMethod(Permissions.SiteMember,async p=>{
   const m=await memberId(),chapter=id(p&&p.chapterId,'chapterId'),mode=p&&p.mode,source=await chapterRow(chapter,false);
   if(!['matching','scenario','keyboard'].includes(mode))fail('UNSUPPORTED_GAME_MODE');
   let total=0;
-  if(mode==='matching')total=(await pairsFor(chapter)).length;
-  if(mode==='scenario')total=Math.min(5,(await all(wixData.query(C.tasks).eq('chapterId',chapter).eq('isActive',true))).length);
+  if(mode==='matching'){
+    const activePairs=await pairsFor(chapter);
+    const progress=await first(wixData.query(C.chapterProgress).eq('memberId',m).eq('chapterId',chapter));
+    const completed=new Set(Array.isArray(progress&&progress.completedPairIds)?progress.completedPairIds:[]);
+    total=Math.min(5,activePairs.filter(row=>!completed.has(row.pairId)).length);
+  }
+  if(mode==='scenario'){
+    const taskRows=await all(wixData.query(C.tasks).eq('chapterId',chapter).eq('isActive',true));
+    total=Math.min(5,taskRows.filter(t=>t.correctAnswer&&taskRows.some(x=>x.itemId===t.correctAnswer)).length);
+  }
   if(mode==='keyboard')total=Math.min(5,Object.keys(SHORTCUTS).length);
   if(!total)fail('CHAPTER_HAS_NO_ACTIVE_CONTENT');
   const created=await wixData.insert(C.attempts,{memberId:m,chapterId:chapter,contentVersion:source.contentVersion||1,
