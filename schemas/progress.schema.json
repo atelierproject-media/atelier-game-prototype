@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "playerId": {
+      "type": "string"
+    },
+    "chapterId": {
+      "type": "string"
+    },
+    "completedPairIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "completedCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "totalQuestions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "remaining": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "progressPercent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "completed"
+      ]
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "playerId",
+    "chapterId",
+    "completedPairIds",
+    "completedCount",
+    "totalQuestions",
+    "progressPercent",
+    "status"
+  ]
+}

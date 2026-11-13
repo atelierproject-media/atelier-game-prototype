@@ -1,0 +1,200 @@
+{
+  "id": "c05_graph_canvas_navigation",
+  "order": 5,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "เครื่องมือกราฟ อาร์ตบอร์ด และการนำทาง",
+    "en": "Graph, Canvas & Navigation"
+  },
+  "summary": {
+    "th": "เรียนรู้การสร้างกราฟ จัดการ Artboard และควบคุมมุมมองพื้นที่ทำงาน",
+    "en": "Learn to create graphs, manage artboards, and navigate the workspace."
+  },
+  "learningObjectives": {
+    "th": [
+      "ระบุเครื่องมือที่ใช้สร้างกราฟและจัดการ Artboard ได้",
+      "ใช้เครื่องมือเลื่อนและซูมเพื่อควบคุมมุมมองพื้นที่ทำงานได้"
+    ],
+    "en": [
+      "Identify tools for creating graphs and managing artboards.",
+      "Use pan and zoom tools to navigate the workspace."
+    ]
+  },
+  "intro": {
+    "th": "บทนี้รวมเครื่องมือที่ช่วยจัดการพื้นที่ทำงาน ตั้งแต่การสร้างกราฟและ Artboard ไปจนถึงการเลื่อนและปรับระดับการมองเห็นงาน",
+    "en": "This chapter covers tools for managing the workspace, from creating graphs and artboards to panning and changing the zoom level."
+  },
+  "items": [
+    {
+      "id": "tool_column_graph",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Column Graph Tool",
+        "en": "Column Graph Tool"
+      },
+      "shortcut": "J",
+      "description": {
+        "th": "ใช้สร้างกราฟแท่งแนวตั้งจากชุดข้อมูล",
+        "en": "Creates a column graph from a data set."
+      },
+      "matchingPrompt": {
+        "th": "สร้างกราฟแท่งแนวตั้งจากข้อมูล",
+        "en": "Create a column graph from data."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Column Graph Tool — ใช้สร้างกราฟแท่งแนวตั้งจากชุดข้อมูล",
+        "en": "Correct! Column Graph Tool: Creates a column graph from a data set."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Column Graph Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Column Graph Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_artboard",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Artboard Tool",
+        "en": "Artboard Tool"
+      },
+      "shortcut": "Shift+O",
+      "description": {
+        "th": "ใช้สร้าง เลือก ปรับขนาด หรือจัดการ Artboards ในเอกสาร",
+        "en": "Creates, selects, resizes, or manages artboards in a document."
+      },
+      "matchingPrompt": {
+        "th": "สร้างหรือปรับขนาด Artboard",
+        "en": "Create or resize an artboard."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Artboard Tool — ใช้สร้าง เลือก ปรับขนาด หรือจัดการ Artboards ในเอกสาร",
+        "en": "Correct! Artboard Tool: Creates, selects, resizes, or manages artboards in a document."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Artboard Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Artboard Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_slice",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Slice Tool",
+        "en": "Slice Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้กำหนดพื้นที่ Slice สำหรับแบ่งงานออกเป็นส่วน ๆ เพื่อการส่งออก",
+        "en": "Defines slice areas to divide artwork into sections for export."
+      },
+      "matchingPrompt": {
+        "th": "กำหนดพื้นที่แบ่งชิ้นงานเพื่อส่งออก",
+        "en": "Define slice areas to divide artwork for export."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Slice Tool — ใช้กำหนดพื้นที่ Slice สำหรับแบ่งงานออกเป็นส่วน ๆ เพื่อการส่งออก",
+        "en": "Correct! Slice Tool: Defines slice areas to divide artwork into sections for export."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Slice Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Slice Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_hand",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Hand Tool",
+        "en": "Hand Tool"
+      },
+      "shortcut": "H",
+      "description": {
+        "th": "ใช้เลื่อนมุมมองพื้นที่ทำงานโดยไม่ย้ายวัตถุ",
+        "en": "Pans the workspace view without moving artwork objects."
+      },
+      "matchingPrompt": {
+        "th": "เลื่อนมุมมองพื้นที่ทำงานโดยไม่ย้ายวัตถุ",
+        "en": "Pan the workspace without moving objects."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Hand Tool — ใช้เลื่อนมุมมองพื้นที่ทำงานโดยไม่ย้ายวัตถุ",
+        "en": "Correct! Hand Tool: Pans the workspace view without moving artwork objects."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Hand Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Hand Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_zoom",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Zoom Tool",
+        "en": "Zoom Tool"
+      },
+      "shortcut": "Z",
+      "description": {
+        "th": "ใช้ขยายหรือย่อมุมมองของพื้นที่ทำงาน",
+        "en": "Zooms in or out of the workspace view."
+      },
+      "matchingPrompt": {
+        "th": "ขยายหรือย่อมุมมองพื้นที่ทำงาน",
+        "en": "Zoom in or out of the workspace."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Zoom Tool — ใช้ขยายหรือย่อมุมมองของพื้นที่ทำงาน",
+        "en": "Correct! Zoom Tool: Zooms in or out of the workspace view."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Zoom Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Zoom Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_tool_column_graph",
+        "itemId": "tool_column_graph"
+      },
+      {
+        "id": "pair_tool_artboard",
+        "itemId": "tool_artboard"
+      },
+      {
+        "id": "pair_tool_slice",
+        "itemId": "tool_slice"
+      },
+      {
+        "id": "pair_tool_hand",
+        "itemId": "tool_hand"
+      },
+      {
+        "id": "pair_tool_zoom",
+        "itemId": "tool_zoom"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจเครื่องมือกราฟ อาร์ตบอร์ด และการนำทางเสร็จสิ้น! ทบทวนรายการที่ยังสับสนแล้วลองฝึกอีกครั้ง",
+    "en": "Graph, Canvas & Navigation mission complete! Review any items you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "The Slice Tool description is a concise learning-level summary; verify exact workflow and current availability in the target version.",
+    "Confirm the intended meaning of Canvas in the course source; the source grouping is retained."
+  ]
+}

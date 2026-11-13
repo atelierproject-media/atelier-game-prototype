@@ -1,0 +1,292 @@
+{
+  "id": "c06_essential_shortcuts",
+  "order": 6,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "คีย์ลัดที่จำเป็น",
+    "en": "Essential Shortcuts"
+  },
+  "summary": {
+    "th": "ฝึกใช้คีย์ลัดพื้นฐานและคำสั่งที่ใช้บ่อยใน Adobe Illustrator",
+    "en": "Practice essential shortcuts and frequently used commands in Adobe Illustrator."
+  },
+  "learningObjectives": {
+    "th": [
+      "จับคู่คำสั่งพื้นฐานกับหน้าที่ได้ถูกต้อง",
+      "ระบุคีย์ลัดของเครื่องมือและคำสั่งที่ระบุไว้ในบทเรียนได้",
+      "แยกคีย์ลัดที่อาจแตกต่างกันตามระบบปฏิบัติการหรือเวอร์ชันได้"
+    ],
+    "en": [
+      "Match common commands with their functions.",
+      "Identify the shortcuts specified in the lesson.",
+      "Recognize shortcuts that may vary by operating system or software version."
+    ]
+  },
+  "intro": {
+    "th": "การใช้คีย์ลัดช่วยให้ทำงานได้คล่องตัวขึ้น บทนี้รวบรวมคำสั่งพื้นฐานที่ใช้บ่อย เพื่อให้ผู้เรียนจดจำหน้าที่และเรียกใช้ได้เหมาะสม",
+    "en": "Keyboard shortcuts can make your workflow more efficient. This chapter gathers frequently used commands so you can remember their functions and apply them appropriately."
+  },
+  "items": [
+    {
+      "id": "shortcut_copy_paste_cut",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Copy / Paste / Cut",
+        "en": "Copy / Paste / Cut"
+      },
+      "shortcut": "Ctrl+C / Ctrl+V / Ctrl+X; macOS: Command equivalents",
+      "description": {
+        "th": "ใช้คัดลอก วาง และตัดวัตถุหรือเนื้อหาที่เลือก",
+        "en": "Copies, pastes, and cuts selected objects or content."
+      },
+      "matchingPrompt": {
+        "th": "คัดลอก วาง หรือตัดวัตถุที่เลือก",
+        "en": "Copy, paste, or cut selected objects."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Copy / Paste / Cut — ใช้คัดลอก วาง และตัดวัตถุหรือเนื้อหาที่เลือก",
+        "en": "Correct! Copy / Paste / Cut: Copies, pastes, and cuts selected objects or content."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Copy / Paste / Cut อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Copy / Paste / Cut and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_undo_redo",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Undo / Redo",
+        "en": "Undo / Redo"
+      },
+      "shortcut": "Ctrl+Z; Redo varies by version/OS",
+      "description": {
+        "th": "ใช้ย้อนกลับหรือทำซ้ำการกระทำก่อนหน้า",
+        "en": "Reverses or reapplies a previous action."
+      },
+      "matchingPrompt": {
+        "th": "ย้อนกลับหรือทำซ้ำการกระทำก่อนหน้า",
+        "en": "Undo or redo a previous action."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Undo / Redo — ใช้ย้อนกลับหรือทำซ้ำการกระทำก่อนหน้า",
+        "en": "Correct! Undo / Redo: Reverses or reapplies a previous action."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Undo / Redo อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Undo / Redo and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_group_ungroup",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Group / Ungroup",
+        "en": "Group / Ungroup"
+      },
+      "shortcut": "Verify shortcut in source/version",
+      "description": {
+        "th": "ใช้รวมวัตถุหลายชิ้นเป็นกลุ่ม หรือแยกวัตถุออกจากกลุ่ม",
+        "en": "Groups multiple objects or ungroups them."
+      },
+      "matchingPrompt": {
+        "th": "รวมวัตถุเป็นกลุ่มหรือแยกออกจากกลุ่ม",
+        "en": "Group objects together or ungroup them."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Group / Ungroup — ใช้รวมวัตถุหลายชิ้นเป็นกลุ่ม หรือแยกวัตถุออกจากกลุ่ม",
+        "en": "Correct! Group / Ungroup: Groups multiple objects or ungroups them."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Group / Ungroup อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Group / Ungroup and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_tool_switch",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Tool Switching",
+        "en": "Tool Switching"
+      },
+      "shortcut": "V / A / P / + / −",
+      "description": {
+        "th": "ใช้เรียกเครื่องมือที่กำหนดผ่านคีย์ลัด เช่น Selection, Direct Selection และ Pen",
+        "en": "Activates specific tools using their keyboard shortcuts, such as Selection, Direct Selection, and Pen."
+      },
+      "matchingPrompt": {
+        "th": "เรียกใช้เครื่องมือด้วยคีย์ลัด เช่น V, A หรือ P",
+        "en": "Activate tools using shortcuts such as V, A, or P."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Tool Switching — ใช้เรียกเครื่องมือที่กำหนดผ่านคีย์ลัด เช่น Selection, Direct Selection และ Pen",
+        "en": "Correct! Tool Switching: Activates specific tools using their keyboard shortcuts, such as Selection, Direct Selection, and Pen."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Tool Switching อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Tool Switching and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_panels",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Show/Hide All Panels",
+        "en": "Show/Hide All Panels"
+      },
+      "shortcut": "Tab",
+      "description": {
+        "th": "ใช้ซ่อนหรือแสดงแผงควบคุมทั้งหมดเพื่อเพิ่มพื้นที่ทำงาน",
+        "en": "Hides or shows panels to provide more workspace."
+      },
+      "matchingPrompt": {
+        "th": "ซ่อนหรือแสดงแผงควบคุมทั้งหมด",
+        "en": "Hide or show all panels."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Show/Hide All Panels — ใช้ซ่อนหรือแสดงแผงควบคุมทั้งหมดเพื่อเพิ่มพื้นที่ทำงาน",
+        "en": "Correct! Show/Hide All Panels: Hides or shows panels to provide more workspace."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Show/Hide All Panels อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Show/Hide All Panels and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_select_all",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Select All",
+        "en": "Select All"
+      },
+      "shortcut": "Ctrl+A / macOS: Command+A",
+      "description": {
+        "th": "ใช้เลือกวัตถุทั้งหมดในเอกสารหรือบริบทที่กำหนด",
+        "en": "Selects all objects in the document or current context."
+      },
+      "matchingPrompt": {
+        "th": "เลือกวัตถุทั้งหมด",
+        "en": "Select all objects."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Select All — ใช้เลือกวัตถุทั้งหมดในเอกสารหรือบริบทที่กำหนด",
+        "en": "Correct! Select All: Selects all objects in the document or current context."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Select All อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Select All and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_active_artboard",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Select All in Active Artboard",
+        "en": "Select All in Active Artboard"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้เลือกวัตถุทั้งหมดภายใน Artboard ที่กำลังทำงาน",
+        "en": "Selects all objects within the active artboard."
+      },
+      "matchingPrompt": {
+        "th": "เลือกวัตถุทั้งหมดใน Artboard ที่กำลังทำงาน",
+        "en": "Select all objects on the active artboard."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Select All in Active Artboard — ใช้เลือกวัตถุทั้งหมดภายใน Artboard ที่กำลังทำงาน",
+        "en": "Correct! Select All in Active Artboard: Selects all objects within the active artboard."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Select All in Active Artboard อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Select All in Active Artboard and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "shortcut_create_layer",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Create a Layer",
+        "en": "Create a Layer"
+      },
+      "shortcut": "Verify shortcut in source/version",
+      "description": {
+        "th": "ใช้สร้าง Layer ใหม่เพื่อแยกจัดการองค์ประกอบของงาน",
+        "en": "Creates a new layer to organize artwork elements."
+      },
+      "matchingPrompt": {
+        "th": "สร้าง Layer ใหม่เพื่อจัดระเบียบองค์ประกอบของงาน",
+        "en": "Create a new layer to organize artwork."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Create a Layer — ใช้สร้าง Layer ใหม่เพื่อแยกจัดการองค์ประกอบของงาน",
+        "en": "Correct! Create a Layer: Creates a new layer to organize artwork elements."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Create a Layer อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Create a Layer and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_shortcut_copy_paste_cut",
+        "itemId": "shortcut_copy_paste_cut"
+      },
+      {
+        "id": "pair_shortcut_undo_redo",
+        "itemId": "shortcut_undo_redo"
+      },
+      {
+        "id": "pair_shortcut_group_ungroup",
+        "itemId": "shortcut_group_ungroup"
+      },
+      {
+        "id": "pair_shortcut_tool_switch",
+        "itemId": "shortcut_tool_switch"
+      },
+      {
+        "id": "pair_shortcut_panels",
+        "itemId": "shortcut_panels"
+      },
+      {
+        "id": "pair_shortcut_select_all",
+        "itemId": "shortcut_select_all"
+      },
+      {
+        "id": "pair_shortcut_active_artboard",
+        "itemId": "shortcut_active_artboard"
+      },
+      {
+        "id": "pair_shortcut_create_layer",
+        "itemId": "shortcut_create_layer"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจคีย์ลัดที่จำเป็นเสร็จสิ้น! ทบทวนรายการที่ยังสับสนแล้วลองฝึกอีกครั้ง",
+    "en": "Essential Shortcuts mission complete! Review any items you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "The project outline does not provide every shortcut. Missing or ambiguous shortcuts are explicitly marked for verification rather than guessed.",
+    "Undo/Redo, Group/Ungroup, and Create Layer shortcuts can vary by OS/version/context; confirm with the course's approved reference before publishing."
+  ]
+}

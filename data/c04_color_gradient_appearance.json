@@ -1,0 +1,350 @@
+{
+  "id": "c04_color_gradient_appearance",
+  "order": 4,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "เครื่องมือสี การไล่ระดับสี และลักษณะปรากฏ",
+    "en": "Color, Gradient & Appearance"
+  },
+  "summary": {
+    "th": "เรียนรู้การจัดการสี การไล่ระดับสี และลักษณะปรากฏของวัตถุ",
+    "en": "Learn to manage color, gradients, and object appearance."
+  },
+  "learningObjectives": {
+    "th": [
+      "แยกหน้าที่ของเครื่องมือจัดการสีและ Gradient ได้",
+      "ระบุคำสั่งที่ใช้จัดการ Fill, Stroke และโหมดการวาดได้"
+    ],
+    "en": [
+      "Distinguish tools for color and gradient editing.",
+      "Identify controls for Fill, Stroke, and drawing modes."
+    ]
+  },
+  "intro": {
+    "th": "สีและลักษณะปรากฏช่วยสื่อสารอารมณ์และรายละเอียดของงานออกแบบ บทนี้จะพาฝึกเครื่องมือที่ใช้เติมสี สร้างการไล่ระดับ และจัดการคุณสมบัติของวัตถุ",
+    "en": "Color and appearance communicate mood and detail in a design. This chapter introduces tools for applying color, creating gradients, and managing object attributes."
+  },
+  "items": [
+    {
+      "id": "tool_gradient",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Gradient Tool",
+        "en": "Gradient Tool"
+      },
+      "shortcut": "G",
+      "description": {
+        "th": "ใช้สร้างหรือปรับการไล่ระดับสีภายในวัตถุ",
+        "en": "Creates or edits a color gradient within an object."
+      },
+      "matchingPrompt": {
+        "th": "สร้างหรือปรับการไล่ระดับสีภายในวัตถุ",
+        "en": "Create or edit a color gradient in an object."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Gradient Tool — ใช้สร้างหรือปรับการไล่ระดับสีภายในวัตถุ",
+        "en": "Correct! Gradient Tool: Creates or edits a color gradient within an object."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Gradient Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Gradient Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_mesh",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Mesh Tool",
+        "en": "Mesh Tool"
+      },
+      "shortcut": "U",
+      "description": {
+        "th": "ใช้สร้าง Gradient Mesh เพื่อควบคุมสีและการไล่ระดับสีหลายตำแหน่งบนวัตถุ",
+        "en": "Creates a gradient mesh to control color transitions at multiple points on an object."
+      },
+      "matchingPrompt": {
+        "th": "สร้าง Mesh เพื่อควบคุมสีหลายตำแหน่งบนวัตถุ",
+        "en": "Create a mesh to control colors at multiple points on an object."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Mesh Tool — ใช้สร้าง Gradient Mesh เพื่อควบคุมสีและการไล่ระดับสีหลายตำแหน่งบนวัตถุ",
+        "en": "Correct! Mesh Tool: Creates a gradient mesh to control color transitions at multiple points on an object."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Mesh Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Mesh Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_eyedropper",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Eyedropper Tool",
+        "en": "Eyedropper Tool"
+      },
+      "shortcut": "I",
+      "description": {
+        "th": "ใช้ดูดหรือคัดลอกคุณสมบัติสีและลักษณะปรากฏจากวัตถุหนึ่งไปใช้อีกวัตถุ",
+        "en": "Samples and applies color or appearance attributes from one object to another."
+      },
+      "matchingPrompt": {
+        "th": "คัดลอกคุณสมบัติสีจากวัตถุหนึ่งไปใช้อีกวัตถุ",
+        "en": "Sample color attributes from one object and apply them to another."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Eyedropper Tool — ใช้ดูดหรือคัดลอกคุณสมบัติสีและลักษณะปรากฏจากวัตถุหนึ่งไปใช้อีกวัตถุ",
+        "en": "Correct! Eyedropper Tool: Samples and applies color or appearance attributes from one object to another."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Eyedropper Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Eyedropper Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_blend",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Blend Tool",
+        "en": "Blend Tool"
+      },
+      "shortcut": "W",
+      "description": {
+        "th": "ใช้สร้างการเปลี่ยนผ่านระหว่างวัตถุหลายชิ้น เช่น การเปลี่ยนตำแหน่ง รูปร่าง หรือสี",
+        "en": "Creates intermediate steps between objects, such as transitions in position, shape, or color."
+      },
+      "matchingPrompt": {
+        "th": "สร้างวัตถุขั้นกลางเพื่อเชื่อมการเปลี่ยนผ่านระหว่างวัตถุ",
+        "en": "Create intermediate steps between objects."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Blend Tool — ใช้สร้างการเปลี่ยนผ่านระหว่างวัตถุหลายชิ้น เช่น การเปลี่ยนตำแหน่ง รูปร่าง หรือสี",
+        "en": "Correct! Blend Tool: Creates intermediate steps between objects, such as transitions in position, shape, or color."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Blend Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Blend Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_symbol_sprayer",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Symbol Sprayer Tool",
+        "en": "Symbol Sprayer Tool"
+      },
+      "shortcut": "Shift+S",
+      "description": {
+        "th": "ใช้พ่นหรือวางอินสแตนซ์ของ Symbol ลงบนพื้นที่งาน",
+        "en": "Sprays instances of a symbol onto the artwork."
+      },
+      "matchingPrompt": {
+        "th": "พ่น Symbol ลงบนพื้นที่งาน",
+        "en": "Spray symbol instances onto the artwork."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Symbol Sprayer Tool — ใช้พ่นหรือวางอินสแตนซ์ของ Symbol ลงบนพื้นที่งาน",
+        "en": "Correct! Symbol Sprayer Tool: Sprays instances of a symbol onto the artwork."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Symbol Sprayer Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Symbol Sprayer Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_fill_stroke",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Fill & Stroke Controls",
+        "en": "Fill & Stroke Controls"
+      },
+      "shortcut": "X / Shift+X",
+      "description": {
+        "th": "ใช้กำหนดและสลับการทำงานระหว่าง Fill และ Stroke ของวัตถุ",
+        "en": "Sets and switches the active Fill and Stroke attributes."
+      },
+      "matchingPrompt": {
+        "th": "กำหนดหรือสลับ Fill และ Stroke ของวัตถุ",
+        "en": "Set or switch an object's Fill and Stroke."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Fill & Stroke Controls — ใช้กำหนดและสลับการทำงานระหว่าง Fill และ Stroke ของวัตถุ",
+        "en": "Correct! Fill & Stroke Controls: Sets and switches the active Fill and Stroke attributes."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Fill & Stroke Controls อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Fill & Stroke Controls and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_default_fill_stroke",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Default Fill & Stroke",
+        "en": "Default Fill & Stroke"
+      },
+      "shortcut": "D",
+      "description": {
+        "th": "ใช้คืนค่า Fill และ Stroke เป็นค่าเริ่มต้น",
+        "en": "Resets Fill and Stroke to their default settings."
+      },
+      "matchingPrompt": {
+        "th": "คืนค่า Fill และ Stroke เป็นค่าเริ่มต้น",
+        "en": "Reset Fill and Stroke to their default settings."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Default Fill & Stroke — ใช้คืนค่า Fill และ Stroke เป็นค่าเริ่มต้น",
+        "en": "Correct! Default Fill & Stroke: Resets Fill and Stroke to their default settings."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Default Fill & Stroke อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Default Fill & Stroke and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_color_gradient_none",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Color / Gradient / None",
+        "en": "Color / Gradient / None"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้กำหนดว่าวัตถุจะแสดงสีพื้น สีไล่ระดับ หรือไม่มี Fill/Stroke ตามตัวเลือก",
+        "en": "Applies a solid color, gradient, or no color to the selected Fill or Stroke."
+      },
+      "matchingPrompt": {
+        "th": "เลือกใช้สีพื้น สีไล่ระดับ หรือไม่แสดงสี",
+        "en": "Choose a solid color, gradient, or no color."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Color / Gradient / None — ใช้กำหนดว่าวัตถุจะแสดงสีพื้น สีไล่ระดับ หรือไม่มี Fill/Stroke ตามตัวเลือก",
+        "en": "Correct! Color / Gradient / None: Applies a solid color, gradient, or no color to the selected Fill or Stroke."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Color / Gradient / None อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Color / Gradient / None and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_draw_modes",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Draw Modes",
+        "en": "Draw Modes"
+      },
+      "shortcut": "Shift+D",
+      "description": {
+        "th": "ใช้สลับโหมดการวาด เช่น วาดปกติ วาดด้านหลัง หรือวาดภายใน",
+        "en": "Switches drawing modes such as Draw Normal, Draw Behind, and Draw Inside."
+      },
+      "matchingPrompt": {
+        "th": "สลับโหมดการวาดปกติ ด้านหลัง หรือภายใน",
+        "en": "Switch between drawing normally, behind, or inside."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Draw Modes — ใช้สลับโหมดการวาด เช่น วาดปกติ วาดด้านหลัง หรือวาดภายใน",
+        "en": "Correct! Draw Modes: Switches drawing modes such as Draw Normal, Draw Behind, and Draw Inside."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Draw Modes อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Draw Modes and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_screen_mode",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Change Screen Mode",
+        "en": "Change Screen Mode"
+      },
+      "shortcut": "F",
+      "description": {
+        "th": "ใช้สลับรูปแบบการแสดงหน้าจอของ Illustrator",
+        "en": "Switches the Illustrator screen display mode."
+      },
+      "matchingPrompt": {
+        "th": "สลับรูปแบบการแสดงหน้าจอ Illustrator",
+        "en": "Switch the Illustrator screen display mode."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Change Screen Mode — ใช้สลับรูปแบบการแสดงหน้าจอของ Illustrator",
+        "en": "Correct! Change Screen Mode: Switches the Illustrator screen display mode."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Change Screen Mode อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Change Screen Mode and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_tool_gradient",
+        "itemId": "tool_gradient"
+      },
+      {
+        "id": "pair_tool_mesh",
+        "itemId": "tool_mesh"
+      },
+      {
+        "id": "pair_tool_eyedropper",
+        "itemId": "tool_eyedropper"
+      },
+      {
+        "id": "pair_tool_blend",
+        "itemId": "tool_blend"
+      },
+      {
+        "id": "pair_tool_symbol_sprayer",
+        "itemId": "tool_symbol_sprayer"
+      },
+      {
+        "id": "pair_tool_fill_stroke",
+        "itemId": "tool_fill_stroke"
+      },
+      {
+        "id": "pair_tool_default_fill_stroke",
+        "itemId": "tool_default_fill_stroke"
+      },
+      {
+        "id": "pair_tool_color_gradient_none",
+        "itemId": "tool_color_gradient_none"
+      },
+      {
+        "id": "pair_tool_draw_modes",
+        "itemId": "tool_draw_modes"
+      },
+      {
+        "id": "pair_tool_screen_mode",
+        "itemId": "tool_screen_mode"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจเครื่องมือสี การไล่ระดับสี และลักษณะปรากฏเสร็จสิ้น! ทบทวนรายการที่ยังสับสนแล้วลองฝึกอีกครั้ง",
+    "en": "Color, Gradient & Appearance mission complete! Review any items you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "Shortcut keys are transcribed from the project outline and should be verified for the target Illustrator version and OS.",
+    "Some entries are controls/commands rather than standalone tools; confirm the intended matching-card grouping."
+  ]
+}

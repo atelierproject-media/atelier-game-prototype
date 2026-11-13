@@ -1,0 +1,200 @@
+{
+  "id": "c01_tools",
+  "order": 1,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "เครื่องมือเลือกวัตถุ",
+    "en": "Selection Tools"
+  },
+  "summary": {
+    "th": "เรียนรู้ความแตกต่างของเครื่องมือที่ใช้เลือกวัตถุและส่วนประกอบของวัตถุใน Adobe Illustrator",
+    "en": "Learn how selection tools differ when selecting objects and parts of objects in Adobe Illustrator."
+  },
+  "learningObjectives": {
+    "th": [
+      "ระบุหน้าที่ของเครื่องมือเลือกวัตถุทั้ง 5 ชนิดได้",
+      "แยกความแตกต่างระหว่างการเลือกวัตถุทั้งชิ้นกับการเลือกจุดยึดหรือส่วนของ Path ได้"
+    ],
+    "en": [
+      "Identify the functions of all five selection tools.",
+      "Distinguish selecting an entire object from selecting anchor points or path segments."
+    ]
+  },
+  "intro": {
+    "th": "ในงานออกแบบแฟชั่น เราต้องเลือกและปรับแต่งชิ้นส่วนของงานอยู่เสมอ เครื่องมือในบทนี้ช่วยให้เลือกวัตถุหรือส่วนต่าง ๆ ของวัตถุได้แตกต่างกัน",
+    "en": "In fashion design, you often need to select and edit different parts of your artwork. These tools let you select whole objects or specific parts in different ways."
+  },
+  "items": [
+    {
+      "id": "tool_selection",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Selection Tool",
+        "en": "Selection Tool"
+      },
+      "shortcut": "V",
+      "description": {
+        "th": "ใช้เลือกวัตถุทั้งชิ้นหรือทั้งกลุ่ม เพื่อย้าย ปรับขนาด หรือจัดการวัตถุ",
+        "en": "Selects entire objects or groups so you can move, resize, or transform them."
+      },
+      "matchingPrompt": {
+        "th": "เลือกวัตถุทั้งชิ้นเพื่อย้ายหรือปรับขนาด",
+        "en": "Select an entire object to move or resize it."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Selection Tool — ใช้เลือกวัตถุทั้งชิ้นหรือทั้งกลุ่ม เพื่อย้าย ปรับขนาด หรือจัดการวัตถุ",
+        "en": "Correct! Selection Tool: Selects entire objects or groups so you can move, resize, or transform them."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Selection Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Selection Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_direct_selection",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Direct Selection Tool",
+        "en": "Direct Selection Tool"
+      },
+      "shortcut": "A",
+      "description": {
+        "th": "ใช้เลือกและแก้ไขจุดยึด (Anchor Points) หรือส่วนของเส้น Path เพื่อปรับรูปทรงบางส่วน",
+        "en": "Selects and edits anchor points or path segments to adjust part of an object's shape."
+      },
+      "matchingPrompt": {
+        "th": "เลือกจุดยึดหรือส่วนของเส้น Path เพื่อปรับรูปทรงบางส่วน",
+        "en": "Select anchor points or path segments to edit part of a shape."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Direct Selection Tool — ใช้เลือกและแก้ไขจุดยึด (Anchor Points) หรือส่วนของเส้น Path เพื่อปรับรูปทรงบางส่วน",
+        "en": "Correct! Direct Selection Tool: Selects and edits anchor points or path segments to adjust part of an object's shape."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Direct Selection Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Direct Selection Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_group_selection",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Group Selection Tool",
+        "en": "Group Selection Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้เลือกวัตถุแต่ละชิ้นที่อยู่ภายในกลุ่ม โดยไม่จำเป็นต้องเลือกทั้งกลุ่ม",
+        "en": "Selects individual objects inside a group without selecting the entire group."
+      },
+      "matchingPrompt": {
+        "th": "เลือกวัตถุหนึ่งชิ้นที่อยู่ภายในกลุ่ม",
+        "en": "Select one object within a group."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Group Selection Tool — ใช้เลือกวัตถุแต่ละชิ้นที่อยู่ภายในกลุ่ม โดยไม่จำเป็นต้องเลือกทั้งกลุ่ม",
+        "en": "Correct! Group Selection Tool: Selects individual objects inside a group without selecting the entire group."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Group Selection Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Group Selection Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_magic_wand",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Magic Wand Tool",
+        "en": "Magic Wand Tool"
+      },
+      "shortcut": "Y",
+      "description": {
+        "th": "ใช้เลือกวัตถุที่มีคุณสมบัติคล้ายกัน เช่น สี Fill หรือ Stroke ตามเกณฑ์ที่ตั้งค่าไว้",
+        "en": "Selects objects with similar attributes, such as fill or stroke, based on configured criteria."
+      },
+      "matchingPrompt": {
+        "th": "เลือกวัตถุหลายชิ้นที่มีคุณสมบัติคล้ายกัน เช่น สี Fill หรือ Stroke",
+        "en": "Select multiple objects with similar attributes, such as fill or stroke."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Magic Wand Tool — ใช้เลือกวัตถุที่มีคุณสมบัติคล้ายกัน เช่น สี Fill หรือ Stroke ตามเกณฑ์ที่ตั้งค่าไว้",
+        "en": "Correct! Magic Wand Tool: Selects objects with similar attributes, such as fill or stroke, based on configured criteria."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Magic Wand Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Magic Wand Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_lasso",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Lasso Tool",
+        "en": "Lasso Tool"
+      },
+      "shortcut": "Q",
+      "description": {
+        "th": "ใช้ลากเส้นเลือกแบบอิสระเพื่อครอบจุดยึดหรือส่วนของเส้น Path ที่ต้องการเลือก",
+        "en": "Draws a freeform selection around the anchor points or path segments you want to select."
+      },
+      "matchingPrompt": {
+        "th": "ลากเส้นเลือกแบบอิสระเพื่อครอบจุดยึดหรือส่วนของ Path",
+        "en": "Draw a freeform selection around anchor points or path segments."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Lasso Tool — ใช้ลากเส้นเลือกแบบอิสระเพื่อครอบจุดยึดหรือส่วนของเส้น Path ที่ต้องการเลือก",
+        "en": "Correct! Lasso Tool: Draws a freeform selection around the anchor points or path segments you want to select."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Lasso Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Lasso Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_tool_selection",
+        "itemId": "tool_selection"
+      },
+      {
+        "id": "pair_tool_direct_selection",
+        "itemId": "tool_direct_selection"
+      },
+      {
+        "id": "pair_tool_group_selection",
+        "itemId": "tool_group_selection"
+      },
+      {
+        "id": "pair_tool_magic_wand",
+        "itemId": "tool_magic_wand"
+      },
+      {
+        "id": "pair_tool_lasso",
+        "itemId": "tool_lasso"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจเครื่องมือเลือกวัตถุเสร็จสิ้น! ทบทวนรายการที่ยังสับสนแล้วลองฝึกอีกครั้ง",
+    "en": "Selection Tools mission complete! Review any items you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "Verify Group Selection Tool presentation and shortcut in the target Illustrator version/workspace.",
+    "Definitions are instructional drafts and require review against the approved course source."
+  ]
+}

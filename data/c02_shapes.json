@@ -1,0 +1,293 @@
+{
+  "id": "c02_shapes",
+  "order": 2,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "เครื่องมือวาดและสร้างรูปทรง",
+    "en": "Drawing & Shape Tools"
+  },
+  "summary": {
+    "th": "เรียนรู้เครื่องมือสำหรับวาดเส้น สร้างรูปทรง และเพิ่มข้อความในงานออกแบบ",
+    "en": "Learn tools for drawing paths, creating shapes, and adding text to artwork."
+  },
+  "learningObjectives": {
+    "th": [
+      "แยกหน้าที่ของเครื่องมือวาดเส้นและสร้างรูปทรงได้",
+      "เลือกเครื่องมือให้ตรงกับลักษณะงาน เช่น วาด Path วาดรูปทรง หรือเพิ่มข้อความ",
+      "จับคู่เครื่องมือทั้ง 8 กลุ่มกับหน้าที่ได้ถูกต้อง"
+    ],
+    "en": [
+      "Distinguish drawing and shape-building tools.",
+      "Identify tools for tasks such as drawing paths, creating shapes, and adding text.",
+      "Match all eight tool groups with their functions."
+    ]
+  },
+  "intro": {
+    "th": "ในงานออกแบบแฟชั่น เราอาจต้องวาดเส้นโครงร่าง สร้างรูปทรง และเพิ่มข้อความลงบนงาน บทนี้จะพาไปรู้จักเครื่องมือที่ใช้สร้างองค์ประกอบเหล่านี้",
+    "en": "Fashion design work often involves drawing outlines, building shapes, and adding text. This chapter introduces the tools used to create these elements."
+  },
+  "items": [
+    {
+      "id": "tool_pen",
+      "type": "tool",
+      "name": {
+        "th": "Pen Tool",
+        "en": "Pen Tool"
+      },
+      "shortcut": "P",
+      "description": {
+        "th": "ใช้สร้างเส้น Path โดยกำหนดจุดยึด (Anchor Points) และควบคุมเส้นโค้งด้วย Handle",
+        "en": "Creates paths by placing anchor points and controlling curves with direction handles."
+      },
+      "matchingPrompt": {
+        "th": "สร้างเส้น Path โดยกำหนดจุดยึดและควบคุมเส้นโค้ง",
+        "en": "Create a path by placing anchor points and controlling curves."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Pen Tool — ใช้สร้างเส้น Path โดยกำหนดจุดยึด (Anchor Points) และควบคุมเส้นโค้งด้วย Handle",
+        "en": "Correct! Pen Tool: Creates paths by placing anchor points and controlling curves with direction handles."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Pen Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Pen Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_anchor_point",
+      "type": "tool_group",
+      "name": {
+        "th": "Add/Delete Anchor Point Tool",
+        "en": "Add/Delete Anchor Point Tool"
+      },
+      "shortcut": "+/−",
+      "description": {
+        "th": "ใช้เพิ่มหรือลบจุดยึดบนเส้น Path เพื่อปรับโครงสร้างของรูปทรง",
+        "en": "Adds or removes anchor points on a path to change its structure."
+      },
+      "matchingPrompt": {
+        "th": "เพิ่มหรือลบจุดยึดบนเส้น Path",
+        "en": "Add or remove anchor points on a path."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Add/Delete Anchor Point Tool — ใช้เพิ่มหรือลบจุดยึดบนเส้น Path เพื่อปรับโครงสร้างของรูปทรง",
+        "en": "Correct! Add/Delete Anchor Point Tool: Adds or removes anchor points on a path to change its structure."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Add/Delete Anchor Point Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Add/Delete Anchor Point Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_curvature",
+      "type": "tool",
+      "name": {
+        "th": "Curvature Tool",
+        "en": "Curvature Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้สร้างหรือปรับเส้น Path โดยควบคุมความโค้งของเส้นผ่านจุดที่วาง",
+        "en": "Creates or edits paths by adjusting curve behavior at placed points."
+      },
+      "matchingPrompt": {
+        "th": "สร้างหรือปรับเส้น Path โดยควบคุมความโค้ง",
+        "en": "Create or edit a path by adjusting its curves."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Curvature Tool — ใช้สร้างหรือปรับเส้น Path โดยควบคุมความโค้งของเส้นผ่านจุดที่วาง",
+        "en": "Correct! Curvature Tool: Creates or edits paths by adjusting curve behavior at placed points."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Curvature Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Curvature Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_type",
+      "type": "tool",
+      "name": {
+        "th": "Type Tool",
+        "en": "Type Tool"
+      },
+      "shortcut": "T",
+      "description": {
+        "th": "ใช้เพิ่มและแก้ไขข้อความในงานออกแบบ",
+        "en": "Adds and edits text in an artwork."
+      },
+      "matchingPrompt": {
+        "th": "เพิ่มหรือแก้ไขข้อความในงานออกแบบ",
+        "en": "Add or edit text in an artwork."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Type Tool — ใช้เพิ่มและแก้ไขข้อความในงานออกแบบ",
+        "en": "Correct! Type Tool: Adds and edits text in an artwork."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Type Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Type Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_line_segment",
+      "type": "tool",
+      "name": {
+        "th": "Line Segment Tool",
+        "en": "Line Segment Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้วาดเส้นตรงระหว่างจุดเริ่มต้นและจุดสิ้นสุด",
+        "en": "Draws a straight line between a start point and an end point."
+      },
+      "matchingPrompt": {
+        "th": "วาดเส้นตรงระหว่างจุดสองจุด",
+        "en": "Draw a straight line between two points."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Line Segment Tool — ใช้วาดเส้นตรงระหว่างจุดเริ่มต้นและจุดสิ้นสุด",
+        "en": "Correct! Line Segment Tool: Draws a straight line between a start point and an end point."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Line Segment Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Line Segment Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_shape",
+      "type": "tool_group",
+      "name": {
+        "th": "Rectangle / Ellipse / Polygon / Star Tools",
+        "en": "Rectangle / Ellipse / Polygon / Star Tools"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้สร้างรูปทรงเรขาคณิตพื้นฐาน เช่น สี่เหลี่ยม วงรี รูปหลายเหลี่ยม และดาว",
+        "en": "Creates basic geometric shapes such as rectangles, ellipses, polygons, and stars."
+      },
+      "matchingPrompt": {
+        "th": "สร้างรูปทรงพื้นฐาน เช่น สี่เหลี่ยม วงรี รูปหลายเหลี่ยม และดาว",
+        "en": "Create basic shapes such as rectangles, ellipses, polygons, and stars."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Rectangle / Ellipse / Polygon / Star Tools — ใช้สร้างรูปทรงเรขาคณิตพื้นฐาน เช่น สี่เหลี่ยม วงรี รูปหลายเหลี่ยม และดาว",
+        "en": "Correct! Rectangle / Ellipse / Polygon / Star Tools: Creates basic geometric shapes such as rectangles, ellipses, polygons, and stars."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Rectangle / Ellipse / Polygon / Star Tools อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Rectangle / Ellipse / Polygon / Star Tools does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_brush",
+      "type": "tool_group",
+      "name": {
+        "th": "Paintbrush / Blob Brush Tools",
+        "en": "Paintbrush / Blob Brush Tools"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "Paintbrush ใช้วาดเส้นลักษณะคล้ายพู่กัน ส่วน Blob Brush วาดเป็นพื้นที่รูปทรงที่เติมสี",
+        "en": "Paintbrush draws brush-like strokes, while Blob Brush creates filled, merged shapes."
+      },
+      "matchingPrompt": {
+        "th": "วาดเส้นคล้ายพู่กัน หรือวาดเป็นพื้นที่รูปทรงที่เติมสี",
+        "en": "Draw brush-like strokes or filled shapes."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Paintbrush / Blob Brush Tools — Paintbrush ใช้วาดเส้นลักษณะคล้ายพู่กัน ส่วน Blob Brush วาดเป็นพื้นที่รูปทรงที่เติมสี",
+        "en": "Correct! Paintbrush / Blob Brush Tools: Paintbrush draws brush-like strokes, while Blob Brush creates filled, merged shapes."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Paintbrush / Blob Brush Tools อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Paintbrush / Blob Brush Tools does and look for the key action in its description."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_pencil",
+      "type": "tool",
+      "name": {
+        "th": "Pencil Tool",
+        "en": "Pencil Tool"
+      },
+      "shortcut": "N",
+      "description": {
+        "th": "ใช้วาดเส้น Path แบบอิสระด้วยการลากเมาส์หรือปากกา",
+        "en": "Draws freehand paths by dragging with a mouse or stylus."
+      },
+      "matchingPrompt": {
+        "th": "วาดเส้น Path แบบอิสระด้วยการลาก",
+        "en": "Draw a freehand path by dragging."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Pencil Tool — ใช้วาดเส้น Path แบบอิสระด้วยการลากเมาส์หรือปากกา",
+        "en": "Correct! Pencil Tool: Draws freehand paths by dragging with a mouse or stylus."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Pencil Tool อีกครั้ง แล้วสังเกตคำสำคัญในคำอธิบาย",
+        "en": "Review what Pencil Tool does and look for the key action in its description."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_tool_pen",
+        "itemId": "tool_pen"
+      },
+      {
+        "id": "pair_tool_anchor_point",
+        "itemId": "tool_anchor_point"
+      },
+      {
+        "id": "pair_tool_curvature",
+        "itemId": "tool_curvature"
+      },
+      {
+        "id": "pair_tool_type",
+        "itemId": "tool_type"
+      },
+      {
+        "id": "pair_tool_line_segment",
+        "itemId": "tool_line_segment"
+      },
+      {
+        "id": "pair_tool_shape",
+        "itemId": "tool_shape"
+      },
+      {
+        "id": "pair_tool_brush",
+        "itemId": "tool_brush"
+      },
+      {
+        "id": "pair_tool_pencil",
+        "itemId": "tool_pencil"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจเครื่องมือวาดและสร้างรูปทรงเสร็จสิ้น! ทบทวนเครื่องมือที่ยังสับสน แล้วลองฝึกอีกครั้ง",
+    "en": "Drawing & Shape Tools mission complete! Review any tools you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "The source outline lists these tool names/groups; descriptions are instructional expansions and need instructor/source review.",
+    "Only shortcuts explicitly available in the project notes are populated: Pen (P), Type (T), Pencil (N), and Add/Delete Anchor Point (+/−). Verify against the target Illustrator version and OS.",
+    "The source groups several related tools together. Confirm whether the game should keep these as grouped pairs or split them into individual tool entries."
+  ]
+}

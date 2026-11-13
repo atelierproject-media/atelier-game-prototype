@@ -1,0 +1,260 @@
+{
+  "id": "c03_transformation_editing",
+  "order": 3,
+  "status": "draft",
+  "contentVersion": 1,
+  "title": {
+    "th": "เครื่องมือปรับแต่งและเปลี่ยนแปลงรูปทรง",
+    "en": "Transformation & Editing Tools"
+  },
+  "summary": {
+    "th": "เรียนรู้เครื่องมือสำหรับหมุน ปรับขนาด ดัดแปลง รวม และตัดวัตถุ",
+    "en": "Learn tools for rotating, scaling, transforming, combining, and cutting objects."
+  },
+  "learningObjectives": {
+    "th": [
+      "เลือกเครื่องมือให้เหมาะกับการเปลี่ยนแปลงวัตถุแต่ละประเภทได้",
+      "แยกหน้าที่ของเครื่องมือปรับรูปทรง รวมรูปทรง และตัดเส้น Path ได้"
+    ],
+    "en": [
+      "Choose an appropriate tool for different object transformations.",
+      "Distinguish tools for reshaping, combining shapes, and cutting paths."
+    ]
+  },
+  "intro": {
+    "th": "เมื่อสร้างวัตถุแล้ว เรามักต้องปรับสัดส่วน เปลี่ยนทิศทาง หรือแก้ไขรูปทรงให้ตรงกับแบบที่ต้องการ บทนี้รวบรวมเครื่องมือสำหรับการปรับแต่งเหล่านั้น",
+    "en": "After creating objects, you may need to adjust proportions, change direction, or edit shapes to match your design. This chapter introduces tools for those transformations."
+  },
+  "items": [
+    {
+      "id": "tool_rotate_reflect",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Rotate / Reflect Tools",
+        "en": "Rotate / Reflect Tools"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้หมุนวัตถุรอบจุดอ้างอิง หรือสะท้อนวัตถุเพื่อสร้างภาพกลับด้าน",
+        "en": "Rotates objects around a reference point or reflects them to create a mirrored result."
+      },
+      "matchingPrompt": {
+        "th": "หมุนหรือสะท้อนวัตถุรอบจุดอ้างอิง",
+        "en": "Rotate or reflect an object around a reference point."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Rotate / Reflect Tools — ใช้หมุนวัตถุรอบจุดอ้างอิง หรือสะท้อนวัตถุเพื่อสร้างภาพกลับด้าน",
+        "en": "Correct! Rotate / Reflect Tools: Rotates objects around a reference point or reflects them to create a mirrored result."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Rotate / Reflect Tools อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Rotate / Reflect Tools and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_scale_shear",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Scale / Shear Tools",
+        "en": "Scale / Shear Tools"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้ปรับขนาดวัตถุ หรือเฉือน/เอียงวัตถุให้เปลี่ยนรูปทรง",
+        "en": "Scales objects or shears them to slant their shape."
+      },
+      "matchingPrompt": {
+        "th": "ปรับขนาดหรือเฉือนวัตถุให้เอียง",
+        "en": "Scale an object or shear it to make it slant."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Scale / Shear Tools — ใช้ปรับขนาดวัตถุ หรือเฉือน/เอียงวัตถุให้เปลี่ยนรูปทรง",
+        "en": "Correct! Scale / Shear Tools: Scales objects or shears them to slant their shape."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Scale / Shear Tools อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Scale / Shear Tools and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_width",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Width Tool",
+        "en": "Width Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้ปรับความหนาของเส้น Stroke ในตำแหน่งต่าง ๆ ของเส้น Path",
+        "en": "Adjusts the width of a stroke at different points along a path."
+      },
+      "matchingPrompt": {
+        "th": "ปรับความหนาของเส้น Stroke เฉพาะตำแหน่ง",
+        "en": "Adjust the stroke width at specific points."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Width Tool — ใช้ปรับความหนาของเส้น Stroke ในตำแหน่งต่าง ๆ ของเส้น Path",
+        "en": "Correct! Width Tool: Adjusts the width of a stroke at different points along a path."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Width Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Width Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_free_transform",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Free Transform Tool",
+        "en": "Free Transform Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้ปรับเปลี่ยนวัตถุด้วยการแปลงรูปแบบต่าง ๆ ผ่านกรอบควบคุม",
+        "en": "Transforms an object using interactive handles for different types of transformations."
+      },
+      "matchingPrompt": {
+        "th": "ปรับเปลี่ยนวัตถุผ่านกรอบควบคุม",
+        "en": "Transform an object using its interactive bounding handles."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Free Transform Tool — ใช้ปรับเปลี่ยนวัตถุด้วยการแปลงรูปแบบต่าง ๆ ผ่านกรอบควบคุม",
+        "en": "Correct! Free Transform Tool: Transforms an object using interactive handles for different types of transformations."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Free Transform Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Free Transform Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_shape_builder",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Shape Builder Tool",
+        "en": "Shape Builder Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้รวม ลบ หรือแบ่งพื้นที่ของรูปทรงที่ซ้อนทับกัน",
+        "en": "Combines, removes, or divides overlapping shape regions."
+      },
+      "matchingPrompt": {
+        "th": "รวม ลบ หรือแบ่งพื้นที่ของรูปทรงที่ซ้อนทับกัน",
+        "en": "Combine, remove, or divide overlapping shape regions."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Shape Builder Tool — ใช้รวม ลบ หรือแบ่งพื้นที่ของรูปทรงที่ซ้อนทับกัน",
+        "en": "Correct! Shape Builder Tool: Combines, removes, or divides overlapping shape regions."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Shape Builder Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Shape Builder Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_perspective_grid",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Perspective Grid Tool",
+        "en": "Perspective Grid Tool"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "ใช้แสดงและจัดการกริดมุมมองเพื่อช่วยสร้างงานในมุมมองเปอร์สเปกทีฟ",
+        "en": "Displays and edits a perspective grid to help create artwork in perspective."
+      },
+      "matchingPrompt": {
+        "th": "แสดงและจัดการกริดสำหรับสร้างงานแบบเปอร์สเปกทีฟ",
+        "en": "Display and manage a grid for perspective artwork."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Perspective Grid Tool — ใช้แสดงและจัดการกริดมุมมองเพื่อช่วยสร้างงานในมุมมองเปอร์สเปกทีฟ",
+        "en": "Correct! Perspective Grid Tool: Displays and edits a perspective grid to help create artwork in perspective."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Perspective Grid Tool อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Perspective Grid Tool and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    },
+    {
+      "id": "tool_eraser_scissors",
+      "type": "tool_or_command",
+      "name": {
+        "th": "Eraser / Scissors Tools",
+        "en": "Eraser / Scissors Tools"
+      },
+      "shortcut": "",
+      "description": {
+        "th": "Eraser ใช้ลบส่วนของงาน ส่วน Scissors ใช้ตัดเส้น Path ที่จุดที่กำหนด",
+        "en": "Eraser removes parts of artwork, while Scissors cuts a path at a selected point."
+      },
+      "matchingPrompt": {
+        "th": "ลบส่วนของงานหรือตัดเส้น Path ณ จุดที่กำหนด",
+        "en": "Erase part of artwork or cut a path at a selected point."
+      },
+      "feedbackCorrect": {
+        "th": "ถูกต้อง! Eraser / Scissors Tools — Eraser ใช้ลบส่วนของงาน ส่วน Scissors ใช้ตัดเส้น Path ที่จุดที่กำหนด",
+        "en": "Correct! Eraser / Scissors Tools: Eraser removes parts of artwork, while Scissors cuts a path at a selected point."
+      },
+      "feedbackIncorrect": {
+        "th": "ลองทบทวนหน้าที่ของ Eraser / Scissors Tools อีกครั้ง แล้วสังเกตคำสำคัญในโจทย์",
+        "en": "Review the purpose of Eraser / Scissors Tools and look for the key phrase in the prompt."
+      },
+      "asset": ""
+    }
+  ],
+  "matching": {
+    "mode": "one-to-one",
+    "maxAttemptsPerPair": 3,
+    "revealAfterMaxAttempts": true,
+    "feedbackTiming": "after-each-pair",
+    "interactionModes": [
+      "drag-and-drop",
+      "click-to-match"
+    ],
+    "pairs": [
+      {
+        "id": "pair_tool_rotate_reflect",
+        "itemId": "tool_rotate_reflect"
+      },
+      {
+        "id": "pair_tool_scale_shear",
+        "itemId": "tool_scale_shear"
+      },
+      {
+        "id": "pair_tool_width",
+        "itemId": "tool_width"
+      },
+      {
+        "id": "pair_tool_free_transform",
+        "itemId": "tool_free_transform"
+      },
+      {
+        "id": "pair_tool_shape_builder",
+        "itemId": "tool_shape_builder"
+      },
+      {
+        "id": "pair_tool_perspective_grid",
+        "itemId": "tool_perspective_grid"
+      },
+      {
+        "id": "pair_tool_eraser_scissors",
+        "itemId": "tool_eraser_scissors"
+      }
+    ]
+  },
+  "resultText": {
+    "th": "ภารกิจเครื่องมือปรับแต่งและเปลี่ยนแปลงรูปทรงเสร็จสิ้น! ทบทวนรายการที่ยังสับสนแล้วลองฝึกอีกครั้ง",
+    "en": "Transformation & Editing Tools mission complete! Review any items you found challenging, then try again."
+  },
+  "reviewNotes": [
+    "Tool groups are kept grouped as listed in the project outline. Confirm whether each group should be split into separate matching cards.",
+    "Descriptions are explanatory drafts; verify exact behavior and terminology against the course source and Illustrator version."
+  ]
+}
