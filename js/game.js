@@ -468,15 +468,15 @@
   }
 
   function renderActivity() {
-    app.innerHTML = \`
+    app.innerHTML = `
       <section class="content-shell narrow-shell">
-        <div class="breadcrumb"><button class="text-button" id="activity-back">← \${t('back')}</button><span>/</span><span>\${esc(localized(activeChapter.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">\${t('chapter')} \${String(activeChapter.order).padStart(2,'0')}</div><h1>\${t('chooseActivity')}</h1></div>
+        <div class="breadcrumb"><button class="text-button" id="activity-back">← ${t('back')}</button><span>/</span><span>${esc(localized(activeChapter.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">${t('chapter')} ${String(activeChapter.order).padStart(2,'0')}</div><h1>${t('chooseActivity')}</h1></div>
         <div class="activity-choice-grid">
-          <button class="activity-choice" id="choose-matching"><span class="activity-number">01</span><strong>\${t('matchingMode')}</strong><small>\${t('roundNotice')}</small><span class="activity-arrow">→</span></button>
-          <button class="activity-choice" id="choose-scenario"><span class="activity-number">02</span><strong>\${t('scenarioMode')}</strong><small>\${t('scenarioInstruction')}</small><span class="activity-arrow">→</span></button>
+          <button class="activity-choice" id="choose-matching"><span class="activity-number">01</span><strong>${t('matchingMode')}</strong><small>${t('roundNotice')}</small><span class="activity-arrow">→</span></button>
+          <button class="activity-choice" id="choose-scenario"><span class="activity-number">02</span><strong>${t('scenarioMode')}</strong><small>${t('scenarioInstruction')}</small><span class="activity-arrow">→</span></button>
         </div>
-      </section>\`;
+      </section>`;
     document.getElementById('activity-back').onclick=()=>setScreen('review');
     document.getElementById('choose-matching').onclick=()=>beginMatchingRound();
     document.getElementById('choose-scenario').onclick=()=>activeChapter.id==='c06_essential_shortcuts'?beginKeyboardRound():beginScenarioRound();
@@ -502,7 +502,7 @@
       attemptStartedAt=Date.now();
       setScreen('scenario');
     } catch(error) {
-      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'SCENARIO_START_FAILED')}</p><button class="secondary-button" id="scenario-start-back">\${t('back')}</button></section>\`;
+      app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(error?.message||'SCENARIO_START_FAILED')}</p><button class="secondary-button" id="scenario-start-back">${t('back')}</button></section>`;
       document.getElementById('scenario-start-back').onclick=()=>setScreen('activity');
     }
   }
@@ -695,17 +695,17 @@
     }
     const options=optionIds.map(id=>activeChapter.items.find(x=>x.id===id)).filter(Boolean);
     const used=scenarioAttempts[q.scenarioId||q.itemId]||0;
-    app.innerHTML=\`
+    app.innerHTML=`
       <section class="content-shell narrow-shell">
-        <div class="breadcrumb"><button class="text-button" id="scenario-exit">← \${t('chapters')}</button><span>/</span><span>\${esc(localized(activeChapter.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">\${t('scenarioMode')}</div><h1>\${t('scenarioQuestion')} \${scenarioIndex+1}/\${pool.length}</h1><p>\${t('scenarioInstruction')}</p></div>
+        <div class="breadcrumb"><button class="text-button" id="scenario-exit">← ${t('chapters')}</button><span>/</span><span>${esc(localized(activeChapter.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">${t('scenarioMode')}</div><h1>${t('scenarioQuestion')} ${scenarioIndex+1}/${pool.length}</h1><p>${t('scenarioInstruction')}</p></div>
         <article class="scenario-card">
-          <div class="scenario-visual"><div class="scenario-artboard">\${scenarioArtwork(q.visual||'default')}</div><span class="scenario-visual-caption">THE FASHION ATELIER · TASK \${String(scenarioIndex+1).padStart(2,'0')}</span></div>
-          <p class="scenario-prompt">\${esc(localized(q.prompt))}</p>
+          <div class="scenario-visual"><div class="scenario-artboard">${scenarioArtwork(q.visual||'default')}</div><span class="scenario-visual-caption">THE FASHION ATELIER · TASK ${String(scenarioIndex+1).padStart(2,'0')}</span></div>
+          <p class="scenario-prompt">${esc(localized(q.prompt))}</p>
         </article>
-        <div class="scenario-options">\${options.map(item=>\`<button class="scenario-option" data-option="\${esc(item.id)}">\${toolIcon(item)}<span><strong>\${esc(localized(item.name))}</strong><small>\${item.shortcut?esc(item.shortcut):t('noShortcut')}</small></span></button>\`).join('')}</div>
-        <div id="scenario-feedback" class="match-feedback" aria-live="polite" \${used?'':'hidden'}></div>
-      </section>\`;
+        <div class="scenario-options">${options.map(item=>`<button class="scenario-option" data-option="${esc(item.id)}">${toolIcon(item)}<span><strong>${esc(localized(item.name))}</strong><small>${item.shortcut?esc(item.shortcut):t('noShortcut')}</small></span></button>`).join('')}</div>
+        <div id="scenario-feedback" class="match-feedback" aria-live="polite" ${used?'':'hidden'}></div>
+      </section>`;
     document.getElementById('scenario-exit').onclick=()=>setScreen('chapters');
     app.querySelectorAll('[data-option]').forEach(btn=>btn.onclick=()=>answerScenario(btn,q,correctItem));
   }
@@ -738,7 +738,7 @@
       }
     }catch(error){
       savingAnswer=false;
-      feedback.hidden=false;feedback.innerHTML=\`<strong>\${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>\${esc(error?.message||'SCENARIO_SAVE_FAILED')}\`;
+      feedback.hidden=false;feedback.innerHTML=`<strong>${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>${esc(error?.message||'SCENARIO_SAVE_FAILED')}`;
       return;
     }
     scenarioAttempts[scenarioId]=attemptNum;
@@ -761,12 +761,12 @@
     feedback.classList.toggle('feedback-wrong',!correct);
     if(correct){
       const detail=result?.feedback?.correct||item?.feedbackCorrect||item?.description||'';
-      feedback.innerHTML=\`<strong>\${t('scenarioCorrect')}</strong><br>\${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">\${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>\`;
+      feedback.innerHTML=`<strong>${t('scenarioCorrect')}</strong><br>${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>`;
     }else if(revealed){
       const detail=result?.feedback?.correct||item?.feedbackCorrect||item?.description||'';
-      feedback.innerHTML=\`<strong>\${t('revealed')}: \${esc(label)}</strong><br>\${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">\${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>\`;
+      feedback.innerHTML=`<strong>${t('revealed')}: ${esc(label)}</strong><br>${esc(localized(detail))}<button class="primary-button scenario-next" id="scenario-next">${scenarioIndex===scenarioPool.length-1?t('viewResults'):t('nextQuestion')} →</button>`;
     }else{
-      feedback.innerHTML=\`<strong>\${t('scenarioIncorrect')}</strong><br>\${esc(localized(result?.feedback?.incorrect||''))}<br><span>\${lang==='th'?\`เหลือโอกาสอีก \${attemptsLeft} ครั้ง ระบบยังไม่เฉลย\`:\`\${attemptsLeft} attempt(s) remaining. The answer is still hidden.\`}</span>\`;
+      feedback.innerHTML=`<strong>${t('scenarioIncorrect')}</strong><br>${esc(localized(result?.feedback?.incorrect||''))}<br><span>${lang==='th'?`เหลือโอกาสอีก ${attemptsLeft} ครั้ง ระบบยังไม่เฉลย`:`${attemptsLeft} attempt(s) remaining. The answer is still hidden.`}</span>`;
     }
     if(correct||revealed){
       document.getElementById('scenario-next').onclick=()=>{scenarioIndex++;renderScenario();};
@@ -813,7 +813,7 @@
       attemptStartedAt=Date.now();
       setScreen('keyboard');
     }catch(error){
-      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'KEYBOARD_START_FAILED')}</p><button class="secondary-button" id="keyboard-start-back">\${t('back')}</button></section>\`;
+      app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(error?.message||'KEYBOARD_START_FAILED')}</p><button class="secondary-button" id="keyboard-start-back">${t('back')}</button></section>`;
       document.getElementById('keyboard-start-back').onclick=()=>setScreen('activity');
     }
   }
@@ -941,7 +941,7 @@
     }catch(error){
       savingAnswer=false;
       feedback.hidden=false;feedback.className='match-feedback feedback-wrong';
-      feedback.innerHTML=\`<strong>\${lang==='th'?'ตรวจสอบคีย์ลัดไม่ได้':'Could not validate shortcut'}</strong><br>\${esc(error?.message||'KEYBOARD_VALIDATION_FAILED')}\`;
+      feedback.innerHTML=`<strong>${lang==='th'?'ตรวจสอบคีย์ลัดไม่ได้':'Could not validate shortcut'}</strong><br>${esc(error?.message||'KEYBOARD_VALIDATION_FAILED')}`;
       return;
     }
     const count=result.attemptNum||(keyboardAttempts[task.id]||0)+1;
@@ -955,16 +955,16 @@
       const answerLabel=result.feedback?.expectedLabel||'';
       const explanation=localized(task.explanation);
       if(ok){
-        feedback.innerHTML=\`<strong>\${lang==='th'?'ถูกต้อง!':'Correct!'}</strong> \${answerLabel?\`<b>\${esc(answerLabel)}</b>\`:''}<br>\${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">\${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>\`;
+        feedback.innerHTML=`<strong>${lang==='th'?'ถูกต้อง!':'Correct!'}</strong> ${answerLabel?`<b>${esc(answerLabel)}</b>`:''}<br>${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>`;
       }else{
-        feedback.innerHTML=\`<strong>\${lang==='th'?'ครบ 3 ครั้งแล้ว · เฉลย':'No attempts left · Answer'}</strong> <b>\${esc(answerLabel)}</b><br>\${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">\${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>\`;
+        feedback.innerHTML=`<strong>${lang==='th'?'ครบ 3 ครั้งแล้ว · เฉลย':'No attempts left · Answer'}</strong> <b>${esc(answerLabel)}</b><br>${esc(explanation)}<br><button class="primary-button scenario-next" id="keyboard-next">${keyboardIndex===keyboardTasks.length-1?t('viewResults'):(lang==='th'?'ข้อต่อไป':'Next task')} →</button>`;
       }
       app.querySelectorAll('[data-key]').forEach(btn=>btn.disabled=true);
       document.getElementById('keyboard-next').onclick=()=>{keyboardIndex++;virtualModifiers.clear();renderKeyboardChallenge();};
     }else{
       const remaining=result.attemptsLeft??Math.max(0,3-count);
       const pressedLabel=keys.map(keyboardDisplayName).join(' + ');
-      feedback.innerHTML=\`<strong>\${lang==='th'?'ยังไม่ถูกต้อง ลองอีกครั้ง':'Not quite. Try again'}</strong><br>\${lang==='th'?\`คุณกด \${esc(pressedLabel)} ซึ่งยังไม่ตรงกับคีย์ลัดของโจทย์\`:\`You pressed \${esc(pressedLabel)}, which does not match this task.\`}<br><span>\${lang==='th'?\`เหลือโอกาสอีก \${remaining} ครั้ง\`:\`\${remaining} attempt(s) remaining\`}</span>\`;
+      feedback.innerHTML=`<strong>${lang==='th'?'ยังไม่ถูกต้อง ลองอีกครั้ง':'Not quite. Try again'}</strong><br>${lang==='th'?`คุณกด ${esc(pressedLabel)} ซึ่งยังไม่ตรงกับคีย์ลัดของโจทย์`:`You pressed ${esc(pressedLabel)}, which does not match this task.`}<br><span>${lang==='th'?`เหลือโอกาสอีก ${remaining} ครั้ง`:`${remaining} attempt(s) remaining`}</span>`;
       virtualModifiers.clear();updateKeyboardPressed();
     }
     savingAnswer=false;
@@ -1007,7 +1007,7 @@
       }else attemptId='preview_attempt';
       matchingRoundsPlayed++;setScreen('matching');
     }catch(error){
-      app.innerHTML=\`<section class="welcome-card"><h1>\${t('loadError')}</h1><p>\${esc(error?.message||'ATTEMPT_START_FAILED')}</p><button class="secondary-button" id="attempt-start-back">\${t('back')}</button></section>\`;
+      app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(error?.message||'ATTEMPT_START_FAILED')}</p><button class="secondary-button" id="attempt-start-back">${t('back')}</button></section>`;
       document.getElementById('attempt-start-back').onclick=()=>setScreen('activity');
     }
   }
@@ -1015,34 +1015,34 @@
   function renderMatching() {
     const ch=activeChapter,pairs=roundPairs;
     const toolItems=ch.items;
-    if(!pairs.length){app.innerHTML=\`<section class="content-shell"><h1>\${t('loadError')}</h1><p>No matching pairs are available for this chapter.</p><button class="secondary-button" id="matching-empty-back">\${t('back')}</button></section>\`;document.getElementById('matching-empty-back').onclick=()=>setScreen('activity');return;}
+    if(!pairs.length){app.innerHTML=`<section class="content-shell"><h1>${t('loadError')}</h1><p>No matching pairs are available for this chapter.</p><button class="secondary-button" id="matching-empty-back">${t('back')}</button></section>`;document.getElementById('matching-empty-back').onclick=()=>setScreen('activity');return;}
     const used=new Set(Object.values(resolvedItemIds).filter(Boolean));
     const toolOrder=shuffle(toolItems.filter(item=>!used.has(item.id)));
     const promptOrder=shuffle(pairs.filter(pair=>!matchedIds.has(pair.id)&&!revealedIds.has(pair.id)));
-    app.innerHTML=\`
+    app.innerHTML=`
       <section class="content-shell">
-        <div class="breadcrumb"><button class="text-button" id="matching-back">← \${t('back')}</button><span>/</span><span>\${esc(localized(ch.title))}</span></div>
-        <div class="section-heading"><div class="eyebrow">\${t('chapter')} \${String(ch.order).padStart(2,'0')} · \${t('matchingIntro')}</div><h1>\${t('matchingIntro')}</h1><p>\${t('matchingInstruction')}</p></div>
+        <div class="breadcrumb"><button class="text-button" id="matching-back">← ${t('back')}</button><span>/</span><span>${esc(localized(ch.title))}</span></div>
+        <div class="section-heading"><div class="eyebrow">${t('chapter')} ${String(ch.order).padStart(2,'0')} · ${t('matchingIntro')}</div><h1>${t('matchingIntro')}</h1><p>${t('matchingInstruction')}</p></div>
         <div class="matching-dashboard">
-          <div class="matching-dashboard-top"><div><span class="eyebrow">\${t('chapterProgress')}</span><strong>\${esc(localized(ch.title))}</strong></div><span class="matching-round-label">\${t('roundComplete')} · \${pairs.length} \${t('item')}</span></div>
-          <div class="matching-progress"><span>\${t('completed')}: \${matchedIds.size+revealedIds.size}/\${pairs.length}</span><div class="progress-track"><i style="width:\${((matchedIds.size+revealedIds.size)/pairs.length)*100}%"></i></div></div>
-          <div class="matching-bank-progress"><span>\${t('chapterProgress')}</span><strong>\${chapterProgress(ch).percent}%</strong><div class="progress-track"><i style="width:\${chapterProgress(ch).percent}%"></i></div><small>\${chapterProgress(ch).completed}/\${chapterProgress(ch).total} · \${chapterProgress(ch).remaining} \${t('remaining')}</small></div>
+          <div class="matching-dashboard-top"><div><span class="eyebrow">${t('chapterProgress')}</span><strong>${esc(localized(ch.title))}</strong></div><span class="matching-round-label">${t('roundComplete')} · ${pairs.length} ${t('item')}</span></div>
+          <div class="matching-progress"><span>${t('completed')}: ${matchedIds.size+revealedIds.size}/${pairs.length}</span><div class="progress-track"><i style="width:${((matchedIds.size+revealedIds.size)/pairs.length)*100}%"></i></div></div>
+          <div class="matching-bank-progress"><span>${t('chapterProgress')}</span><strong>${chapterProgress(ch).percent}%</strong><div class="progress-track"><i style="width:${chapterProgress(ch).percent}%"></i></div><small>${chapterProgress(ch).completed}/${chapterProgress(ch).total} · ${chapterProgress(ch).remaining} ${t('remaining')}</small></div>
         </div>
         <div class="matching-columns">
-          <div class="matching-column"><h2>\${t('tools')}</h2><div class="match-list" id="tool-list">
-            \${toolOrder.map(item=>\`<button class="match-tool \${lastChoice&&!lastChoice.correct&&lastChoice.toolId===item.id?'is-wrong':''}" draggable="true" data-tool="\${esc(item.id)}">\${toolIcon(item)}<span class="match-tool-copy"><strong>\${esc(localized(item.name))}</strong>\${item.shortcut?\`<small>\${esc(item.shortcut)}</small>\`:''}</span></button>\`).join('')}
+          <div class="matching-column"><h2>${t('tools')}</h2><div class="match-list" id="tool-list">
+            ${toolOrder.map(item=>`<button class="match-tool ${lastChoice&&!lastChoice.correct&&lastChoice.toolId===item.id?'is-wrong':''}" draggable="true" data-tool="${esc(item.id)}">${toolIcon(item)}<span class="match-tool-copy"><strong>${esc(localized(item.name))}</strong>${item.shortcut?`<small>${esc(item.shortcut)}</small>`:''}</span></button>`).join('')}
           </div></div>
-          <div class="matching-column"><h2>\${t('functions')}</h2><div class="match-list" id="prompt-list">
-            \${promptOrder.map(pair=>{
+          <div class="matching-column"><h2>${t('functions')}</h2><div class="match-list" id="prompt-list">
+            ${promptOrder.map(pair=>{
               const item=pair.itemId?toolItems.find(x=>x.id===pair.itemId):null;
               const prompt=pair.matchingPrompt?localized(pair.matchingPrompt):localized(item?.matchingPrompt);
-              return \`<button class="match-prompt \${lastChoice&&!lastChoice.correct&&lastChoice.targetId===pair.id?'is-wrong':''}" data-target="\${esc(pair.id)}" data-pair="\${esc(pair.id)}"><span>\${esc(prompt)}</span><small>\${t('dropHere')}</small></button>\`;
+              return `<button class="match-prompt ${lastChoice&&!lastChoice.correct&&lastChoice.targetId===pair.id?'is-wrong':''}" data-target="${esc(pair.id)}" data-pair="${esc(pair.id)}"><span>${esc(prompt)}</span><small>${t('dropHere')}</small></button>`;
             }).join('')}
           </div></div>
         </div>
-        <div id="match-feedback" class="match-feedback" \${lastFeedback?'':'hidden'}>\${lastFeedback||''}</div>
-        <div class="page-actions"><button class="secondary-button" id="quit-match">\${t('chapters')}</button><button class="primary-button" id="match-results" \${matchedIds.size+revealedIds.size===pairs.length?'':'disabled'}>\${t('viewResults')} →</button></div>
-      </section>\`;
+        <div id="match-feedback" class="match-feedback" ${lastFeedback?'':'hidden'}>${lastFeedback||''}</div>
+        <div class="page-actions"><button class="secondary-button" id="quit-match">${t('chapters')}</button><button class="primary-button" id="match-results" ${matchedIds.size+revealedIds.size===pairs.length?'':'disabled'}>${t('viewResults')} →</button></div>
+      </section>`;
     document.getElementById('matching-back').onclick=()=>setScreen('review');
     document.getElementById('quit-match').onclick=()=>setScreen('chapters');
     document.getElementById('match-results').onclick=()=>finishChapter();
@@ -1087,7 +1087,7 @@
         revealed=!correct&&attemptLocal>=3;
       }
     }catch(error){
-      savingAnswer=false;lastFeedback=\`<strong>\${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>\${esc(error?.message||'ANSWER_SAVE_FAILED')}\`;
+      savingAnswer=false;lastFeedback=`<strong>${esc(lang==='th'?'บันทึกคำตอบไม่สำเร็จ':'Could not save answer')}</strong><br>${esc(error?.message||'ANSWER_SAVE_FAILED')}`;
       renderMatching();const fb=document.getElementById('match-feedback');if(fb)fb.hidden=false;return;
     }
     pairAttempts[pairId]=attemptNum;
@@ -1102,9 +1102,9 @@
       if(!sessionCompletedPairIds[activeChapter.id].includes(pairId))sessionCompletedPairIds[activeChapter.id].push(pairId);
     }
     let message='';
-    if(correct)message=\`<strong>\${t('correct')}</strong> \${esc(localized(correctFeedback))}\`;
-    else if(revealed)message=\`<strong>\${t('revealed')}</strong> \${esc(localized(matched?.name))} — \${esc(localized(matched?.description))}\`;
-    else message=\`<strong>\${t('incorrect')}</strong> \${esc(localized(incorrectFeedback))}<br><small>\${t('attemptsLeft')}: \${attemptsLeft}</small>\`;
+    if(correct)message=`<strong>${t('correct')}</strong> ${esc(localized(correctFeedback))}`;
+    else if(revealed)message=`<strong>${t('revealed')}</strong> ${esc(localized(matched?.name))} — ${esc(localized(matched?.description))}`;
+    else message=`<strong>${t('incorrect')}</strong> ${esc(localized(incorrectFeedback))}<br><small>${t('attemptsLeft')}: ${attemptsLeft}</small>`;
     selectedToolId=null;pairStart=Date.now();lastFeedback=message;savingAnswer=false;renderMatching();
     const fb=document.getElementById('match-feedback');
     if(fb){fb.hidden=false;fb.classList.toggle('feedback-correct',correct);fb.classList.toggle('feedback-wrong',!correct);fb.innerHTML=message;}
@@ -1165,7 +1165,7 @@
   }
 
   async function renderProgress() {
-    app.innerHTML=\`<section class="content-shell"><div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>\${t('myProgress')}</h1><p>\${t('loadingProgress')}</p></div></section>\`;
+    app.innerHTML=`<section class="content-shell"><div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>${t('myProgress')}</h1><p>${t('loadingProgress')}</p></div></section>`;
     let data=null,history=[];
     try{
       if(isWixEmbedded&&!previewMode){
@@ -1189,47 +1189,47 @@
     }catch(error){
       const message=error?.message||'PROGRESS_LOAD_FAILED';
       const loginRequired=message.includes('MEMBER_LOGIN_REQUIRED');
-      app.innerHTML=\`<section class="content-shell narrow-shell"><div class="section-heading"><h1>\${t('myProgress')}</h1><p>\${esc(loginRequired?t('signInProgress'):message)}</p></div><div class="page-actions"><button class="secondary-button" id="progress-home">\${t('backHome')}</button></div></section>\`;
+      app.innerHTML=`<section class="content-shell narrow-shell"><div class="section-heading"><h1>${t('myProgress')}</h1><p>${esc(loginRequired?t('signInProgress'):message)}</p></div><div class="page-actions"><button class="secondary-button" id="progress-home">${t('backHome')}</button></div></section>`;
       document.getElementById('progress-home').onclick=()=>setScreen('home');
       return;
     }
     const chapterRows=(data?.chapters||[]).slice().sort((a,b)=>(a.order||0)-(b.order||0));
     const fmtTime=ms=>{
       const minutes=Math.floor((ms||0)/60000),seconds=Math.floor(((ms||0)%60000)/1000);
-      return minutes?minutes+\`m \`+seconds+\`s\`:seconds+\`s\`;
+      return minutes?minutes+`m `+seconds+`s`:seconds+`s`;
     };
-    app.innerHTML=\`
+    app.innerHTML=`
       <section class="content-shell">
-        <div class="breadcrumb"><button class="text-button" id="progress-home">← \${t('backHome')}</button><span>/</span><span>PROGRESS</span></div>
-        <div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>\${t('myProgress')}</h1><p>\${t('overallProgress')}</p></div>
+        <div class="breadcrumb"><button class="text-button" id="progress-home">← ${t('backHome')}</button><span>/</span><span>PROGRESS</span></div>
+        <div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>${t('myProgress')}</h1><p>${t('overallProgress')}</p></div>
         <div class="progress-overview-grid">
-          <article class="result-stat"><strong>\${data?.completedChapterCount||0}/\${chapters.length}</strong><span>\${t('completedChaptersLabel')}</span></article>
-          <article class="result-stat"><strong>\${data?.totalAttempts||0}</strong><span>\${t('totalAttemptsLabel')}</span></article>
-          <article class="result-stat"><strong>\${data?.accuracyPercent||0}%</strong><span>\${t('accuracyLabel')}</span></article>
+          <article class="result-stat"><strong>${data?.completedChapterCount||0}/${chapters.length}</strong><span>${t('completedChaptersLabel')}</span></article>
+          <article class="result-stat"><strong>${data?.totalAttempts||0}</strong><span>${t('totalAttemptsLabel')}</span></article>
+          <article class="result-stat"><strong>${data?.accuracyPercent||0}%</strong><span>${t('accuracyLabel')}</span></article>
         </div>
-        <div class="section-heading progress-subheading"><h2>\${t('chapterProgress')}</h2></div>
+        <div class="section-heading progress-subheading"><h2>${t('chapterProgress')}</h2></div>
         <div class="progress-chapter-list">
-          \${chapterRows.map(ch=>\`<article class="info-card progress-chapter-card">
-            <div class="chapter-progress-meta"><b>\${String(ch.order||0).padStart(2,'0')} · \${esc(localized(ch.title))}</b><b>\${ch.progressPercent||0}%</b></div>
-            <div class="progress-track"><i style="width:\${ch.progressPercent||0}%"></i></div>
-            <p>\${ch.matchingCompleted||0}/\${ch.matchingTotal||0} · \${ch.remaining||0} \${t('remaining')}</p>
-            <small>\${t('scenarioMode')}: \${ch.scenarioQuestionsResolved||0} · \${lang==='th'?'คีย์ลัด':'Keyboard'}: \${ch.keyboardQuestionsResolved||0}</small>
-          </article>\`).join('')||\`<p class="muted">\${t('noProgress')}</p>\`}
+          ${chapterRows.map(ch=>`<article class="info-card progress-chapter-card">
+            <div class="chapter-progress-meta"><b>${String(ch.order||0).padStart(2,'0')} · ${esc(localized(ch.title))}</b><b>${ch.progressPercent||0}%</b></div>
+            <div class="progress-track"><i style="width:${ch.progressPercent||0}%"></i></div>
+            <p>${ch.matchingCompleted||0}/${ch.matchingTotal||0} · ${ch.remaining||0} ${t('remaining')}</p>
+            <small>${t('scenarioMode')}: ${ch.scenarioQuestionsResolved||0} · ${lang==='th'?'คีย์ลัด':'Keyboard'}: ${ch.keyboardQuestionsResolved||0}</small>
+          </article>`).join('')||`<p class="muted">${t('noProgress')}</p>`}
         </div>
-        <div class="section-heading progress-subheading"><h2>\${t('recentActivity')}</h2></div>
+        <div class="section-heading progress-subheading"><h2>${t('recentActivity')}</h2></div>
         <div class="progress-attempt-list">
-          \${history.map(a=>{
+          ${history.map(a=>{
             const chapter=chapters.find(ch=>ch.id===a.chapterId);
             const mode=a.mode==='keyboard'?(lang==='th'?'ฝึกคีย์ลัด':'Keyboard'):a.mode==='scenario'?t('scenarioMode'):t('matchingMode');
             const date=a.startTime?new Date(a.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
-            return \`<article class="info-card progress-attempt-card">
-              <div><strong>\${esc(localized(chapter?.title)||a.chapterId)}</strong><small>\${esc(mode)} · \${esc(date)}</small></div>
-              <b>\${a.correctCount||0}/\${a.totalQuestions||0}</b>
-              <small>\${a.scorePercent||0}% · \${fmtTime(a.timeSpentMs||0)}</small>
-            </article>\`;
-          }).join('')||\`<p class="muted">\${t('noProgress')}</p>\`}
+            return `<article class="info-card progress-attempt-card">
+              <div><strong>${esc(localized(chapter?.title)||a.chapterId)}</strong><small>${esc(mode)} · ${esc(date)}</small></div>
+              <b>${a.correctCount||0}/${a.totalQuestions||0}</b>
+              <small>${a.scorePercent||0}% · ${fmtTime(a.timeSpentMs||0)}</small>
+            </article>`;
+          }).join('')||`<p class="muted">${t('noProgress')}</p>`}
         </div>
-      </section>\`;
+      </section>`;
     document.getElementById('progress-home').onclick=()=>setScreen('home');
   }
 
