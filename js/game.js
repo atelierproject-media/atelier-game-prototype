@@ -93,6 +93,7 @@
   let selectedToolId = null;
   let stats = freshStats();
   let pairStart = 0;
+  let attemptStartedAt = Date.now();
   let lastFeedback = null;
   let roundPairs = [];
   let matchingRoundsPlayed = 0;
@@ -134,8 +135,97 @@
     return out;
   };
 
+  // Wix HTML Component bridge. Local standalone testing remains supported.
+  const isWixEmbedded = window.parent !== window;
+  const wixPendingRequests = new Map();
+  let wixRequestSequence = 0;
+  let wixWriteQueue = Promise.resolve();
+  const remoteProgressCache = Object.create(null);
+
+  window.addEventListener('message', event => {
+    const message = event.data;
+    if (!message || message.channel !== 'ATELIER_WIX' || message.kind !== 'response') return;
+    const pending = wixPendingRequests.get(message.requestId);
+    if (!pending) return;
+    window.clearTimeout(pending.timer);
+    wixPendingRequests.delete(message.requestId);
+    if (message.ok) pending.resolve(message.data);
+    else pending.reject(new Error(message.error || 'WIX_BACKEND_ERROR'));
+  });
+
+  function callWixBackend(method, payload = {}) {
+    if (!isWixEmbedded) return Promise.reject(new Error('WIX_BRIDGE_UNAVAILABLE'));
+    const requestId = `atelier_${Date.now()}_${++wixRequestSequence}`;
+    return new Promise((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        wixPendingRequests.delete(requestId);
+        reject(new Error('WIX_REQUEST_TIMEOUT'));
+      }, 15000);
+      wixPendingRequests.set(requestId, { resolve, reject, timer });
+      window.parent.postMessage({
+        channel: 'ATELIER_WIX',
+        kind: 'request',
+        requestId,
+        method,
+        payload
+      }, '*');
+    });
+  }
+
+  function queueWixWrite(method, payload) {
+    if (!isWixEmbedded || previewMode) return Promise.resolve(null);
+    wixWriteQueue = wixWriteQueue
+      .then(() => callWixBackend(method, payload))
+      .catch(error => {
+        console.warn('[ATELIER Wix Sync]', method, error?.message || error);
+        return null;
+      });
+    return wixWriteQueue;
+  }
+
+  async function refreshRemoteProgress() {
+    if (!isWixEmbedded || previewMode || !chapters.length) return;
+    const results = await Promise.all(chapters.map(async chapter => {
+      try {
+        const result = await callWixBackend('getChapterProgress', { chapterId: chapter.id });
+        return { chapterId: chapter.id, result };
+      } catch (_) {
+        return null;
+      }
+    }));
+    let changed = false;
+    results.forEach(entry => {
+      if (!entry?.result) return;
+      remoteProgressCache[entry.chapterId] = entry.result;
+      changed = true;
+    });
+    if (changed && screen === 'chapters') renderChapterSelection();
+  }
+
+  function sendRemoteAttemptStart() {
+    if (!isWixEmbedded || previewMode || !activeChapter || !attemptId) return;
+    queueWixWrite('startAttempt', {
+      attemptId,
+      chapterId: activeChapter.id,
+      contentVersion: activeChapter.contentVersion || 1,
+      mode: 'matching',
+      totalQuestions: (activeChapter.matching?.pairs || []).length
+    });
+  }
+
   async function loadAllChapters() {
     const loaded = await Promise.all(CHAPTER_FILES.map(async id => {
+      if (isWixEmbedded) {
+        try {
+          const cmsChapter = await callWixBackend('getChapterBundle', { chapterId: id });
+          if (cmsChapter?.id && Array.isArray(cmsChapter.items) && Array.isArray(cmsChapter.matching?.pairs)) {
+            return cmsChapter;
+          }
+          throw new Error('INVALID_CMS_CHAPTER_BUNDLE');
+        } catch (error) {
+          console.info('[ATELIER] Using bundled chapter data for', id, error?.message || error);
+        }
+      }
       const res = await fetch(`data/${id}.json`);
       if (!res.ok) throw new Error(`Could not load ${id}`);
       return res.json();
@@ -221,9 +311,13 @@
     const bank = ch.matching?.pairs || [];
     const ids = bank.map(pair => pair.id);
     if (!ids.length) return { completed:0, total:0, percent:0, remaining:0, done:false };
-    const completedIds = (!previewMode && typeof recordAdapter !== 'undefined')
+    const localCompletedIds = (!previewMode && typeof recordAdapter !== 'undefined')
       ? recordAdapter.getChapterProgress(PLAYER_ID, ch.id, ids).completedPairIds
       : (sessionCompletedPairIds[ch.id] || []);
+    const remoteCompletedIds = (!previewMode && remoteProgressCache[ch.id]?.completedPairIds)
+      ? remoteProgressCache[ch.id].completedPairIds
+      : [];
+    const completedIds = [...new Set([...localCompletedIds, ...remoteCompletedIds])];
     const completed = ids.filter(id => completedIds.includes(id)).length;
     return { completed, total:ids.length, percent:Math.round(completed/ids.length*100), remaining:ids.length-completed, done:completed===ids.length };
   }
@@ -256,8 +350,10 @@
     stats = freshStats(); pairAttempts = {}; matchedIds = new Set(); revealedIds = new Set(); selectedToolId = null; lastFeedback = null; matchingRoundsPlayed = 0;
     lastChoice = null; scenarioIndex = 0; scenarioCorrect = 0; scenarioWrong = 0;
     roundPairs = []; // Select the five-question round only when the learner starts Matching.
+    attemptStartedAt = Date.now();
     if (!previewMode && typeof recordAdapter !== 'undefined') {
       attemptId = recordAdapter.startAttempt(PLAYER_ID, activeChapter.id, activeChapter.contentVersion || 1);
+      sendRemoteAttemptStart();
     } else attemptId = 'preview_attempt';
     setScreen('intro');
   }
@@ -806,7 +902,9 @@
     pairStart = Date.now();
     if (matchingRoundsPlayed > 0 && !previewMode && typeof recordAdapter !== 'undefined') {
       attemptId = recordAdapter.startAttempt(PLAYER_ID, activeChapter.id, activeChapter.contentVersion || 1);
+      sendRemoteAttemptStart();
     }
+    attemptStartedAt = Date.now();
     matchingRoundsPlayed++;
     setScreen('matching');
   }
@@ -914,7 +1012,25 @@
 
     if (!previewMode && typeof recordAdapter !== 'undefined') {
       recordAdapter.recordAnswer(attemptId,pairId,selectedId,correct,attemptNum,timeSpent,revealed);
-      if (correct || revealed) recordAdapter.resolveQuestion(PLAYER_ID, activeChapter.id, pairId, (activeChapter.matching?.pairs || []).length);
+      queueWixWrite('recordAnswer', {
+        answerId: `ans_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        attemptId,
+        chapterId: activeChapter.id,
+        pairId,
+        selectedItemId: selectedId,
+        attemptNum,
+        isCorrect: correct,
+        isRevealed: revealed,
+        timeSpentMs: timeSpent
+      });
+      if (correct || revealed) {
+        recordAdapter.resolveQuestion(PLAYER_ID, activeChapter.id, pairId, (activeChapter.matching?.pairs || []).length);
+        queueWixWrite('resolveQuestion', {
+          chapterId: activeChapter.id,
+          pairId,
+          totalQuestions: (activeChapter.matching?.pairs || []).length
+        });
+      }
     } else if (correct || revealed) {
       sessionCompletedPairIds[activeChapter.id] ||= [];
       if (!sessionCompletedPairIds[activeChapter.id].includes(pairId)) sessionCompletedPairIds[activeChapter.id].push(pairId);
@@ -935,7 +1051,17 @@
 
   function finishChapter() {
     if (!activeChapter) return;
-    if (!previewMode && typeof recordAdapter !== 'undefined') recordAdapter.completeAttempt(attemptId,stats);
+    if (!previewMode && typeof recordAdapter !== 'undefined') {
+      recordAdapter.completeAttempt(attemptId,stats);
+      queueWixWrite('completeAttempt', {
+        attemptId,
+        stats: {
+          correctMatches: stats.totalCorrect,
+          totalAttempts: stats.totalCorrect + stats.totalIncorrectAttempts,
+          timeSpentMs: Math.max(0, Date.now() - attemptStartedAt)
+        }
+      });
+    }
     setScreen('result');
   }
 
@@ -996,6 +1122,7 @@
       } else {
         setScreen('language');
       }
+      if (isWixEmbedded) refreshRemoteProgress();
     } catch (err) {
       app.innerHTML = `<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(err.message)}</p><p>Run this project through a local web server (not by opening the HTML file directly).</p></section>`;
       console.error(err);
