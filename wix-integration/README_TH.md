@@ -64,7 +64,7 @@ Admin สามารถเรียก `getChapterBundleForAdmin` และ `ge
 2. เปิด Page Code ของหน้า Practice แล้ว Merge handler จาก `Practice-page-code.v2.example.js` โดยคง handler เดิมที่ไม่เกี่ยวข้องไว้
 3. ตรวจว่า HTML Component ของเกมบน Practice page มี ID เป็น `html2`
 4. ตรวจว่า HTML Component `#html2` ชี้ไปยัง build/deployment ของเกมที่ใช้ `js/game.js` และ `css/style.css` เวอร์ชัน branch นี้
-5. Preview ด้วย Admin เพื่อทดสอบเนื้อหา Draft โดยไม่เขียน Learning Records
+5. สำหรับ Admin Preview ให้ตั้ง URL ของ HTML Component เป็น build เกมที่ต่อท้าย `?preview=true` เพื่อเรียกเมธอด Admin-only และไม่บันทึกผล; เมื่อนำไปใช้จริงกับนักศึกษาให้เอาพารามิเตอร์นี้ออก
 
 ## แสดง Progress บนหน้าเว็บไซต์
 
