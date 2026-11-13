@@ -3,8 +3,8 @@
  * Existing HTML Component ID: #html2. Merge with the page code; preserve other handlers.
  */
 import {
-  getChapterBundle,getChapterBundleForAdmin,startAttempt,recordAnswer,recordScenarioAnswer,
-  recordKeyboardAnswer,getChapterProgress,completeAttempt,getMyProgress,getMyGameHistory
+  getChapterBundle,getChapterBundleForAdmin,getScenarioBundle,getScenarioBundleForAdmin,startAttempt,recordAnswer,
+  recordKeyboardAnswer,checkKeyboardAnswerForAdmin,getChapterProgress,completeAttempt,getMyProgress,getMyGameHistory
 } from 'backend/gameBackendNext.web';
 
 $w.onReady(()=>{
@@ -19,10 +19,13 @@ $w.onReady(()=>{
       switch(msg.method){
         case 'getChapterBundle': data=await getChapterBundle({chapterId:p.chapterId}); break;
         case 'getChapterBundleForAdmin': data=await getChapterBundleForAdmin({chapterId:p.chapterId}); break;
+        case 'getScenarioBundle': data=await getScenarioBundle({chapterId:p.chapterId}); break;
+        case 'getScenarioBundleForAdmin': data=await getScenarioBundleForAdmin({chapterId:p.chapterId}); break;
         case 'startAttempt': data=await startAttempt({chapterId:p.chapterId,mode:p.mode}); break;
         case 'recordAnswer': data=await recordAnswer({attemptId:p.attemptId,chapterId:p.chapterId,pairId:p.pairId,selectedItemId:p.selectedItemId,timeSpentMs:p.timeSpentMs}); break;
-        case 'recordScenarioAnswer': data=await recordScenarioAnswer({attemptId:p.attemptId,chapterId:p.chapterId,taskId:p.taskId,selectedItemId:p.selectedItemId,timeSpentMs:p.timeSpentMs}); break;
+        case 'recordScenarioAnswer': data=await recordScenarioAnswer({attemptId:p.attemptId,chapterId:p.chapterId,scenarioId:p.scenarioId,selectedItemId:p.selectedItemId,timeSpentMs:p.timeSpentMs}); break;
         case 'recordKeyboardAnswer': data=await recordKeyboardAnswer({attemptId:p.attemptId,chapterId:p.chapterId,taskKey:p.taskKey,keys:p.keys,timeSpentMs:p.timeSpentMs}); break;
+        case 'checkKeyboardAnswerForAdmin': data=await checkKeyboardAnswerForAdmin({taskKey:p.taskKey,keys:p.keys}); break;
         case 'getChapterProgress': data=await getChapterProgress({chapterId:p.chapterId}); break;
         case 'completeAttempt': data=await completeAttempt({attemptId:p.attemptId}); break;
         case 'getMyProgress': data=await getMyProgress(); break;
