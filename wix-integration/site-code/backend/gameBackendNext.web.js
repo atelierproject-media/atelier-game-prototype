@@ -147,6 +147,44 @@ function summarize(attempt,answers){
 export const getChapterBundle=webMethod(Permissions.SiteMember,async p=>{await memberId();return bundle(id(p&&p.chapterId,'chapterId'),false);});
 export const getChapterBundleForAdmin=webMethod(Permissions.Admin,async p=>bundle(id(p&&p.chapterId,'chapterId'),true));
 
+async function makeScenarioBundle(chapterId,includeAnswer){
+  await chapterRow(chapterId,!includeAnswer);
+  const tasks=await all(wixData.query(C.tasks).eq('chapterId',chapterId).eq('isActive',true));
+  const eligible=tasks.filter(t=>t.correctAnswer&&tasks.some(x=>x.itemId===t.correctAnswer));
+  function shuffled(rows){
+    const out=rows.slice();
+    for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
+    return out;
+  }
+  const questions=shuffled(eligible).slice(0,5).map(task=>{
+    const correctId=task.correctAnswer;
+    const distractors=shuffled(tasks.filter(t=>t.itemId!==correctId)).slice(0,3).map(t=>t.itemId);
+    const options=shuffled([correctId,...distractors]);
+    const rawTh=task.matchingPromptTh||task.descriptionTh||task.question||'';
+    const rawEn=task.matchingPromptEn||task.descriptionEn||task.question||'';
+    const question={
+      scenarioId:task._id,
+      prompt:{
+        th:'สถานการณ์ในห้องออกแบบแฟชั่น: '+rawTh+' ควรเลือกเครื่องมือใด?',
+        en:'Fashion studio situation: '+rawEn+' Which tool should you choose?'
+      },
+      visual:'default',
+      options
+    };
+    if(includeAnswer)question.answerItemId=correctId;
+    return question;
+  });
+  return {questions};
+}
+export const getScenarioBundle=webMethod(Permissions.SiteMember,async p=>{
+  await memberId();
+  return makeScenarioBundle(id(p&&p.chapterId,'chapterId'),false);
+});
+export const getScenarioBundleForAdmin=webMethod(Permissions.Admin,async p=>{
+  return makeScenarioBundle(id(p&&p.chapterId,'chapterId'),true);
+});
+
+
 export const startAttempt=webMethod(Permissions.SiteMember,async p=>{
   const m=await memberId(),chapter=id(p&&p.chapterId,'chapterId'),mode=p&&p.mode,source=await chapterRow(chapter,false);
   if(!['matching','scenario','keyboard'].includes(mode))fail('UNSUPPORTED_GAME_MODE');
@@ -179,14 +217,12 @@ export const recordAnswer=webMethod(Permissions.SiteMember,async p=>{
 
 export const recordScenarioAnswer=webMethod(Permissions.SiteMember,async p=>{
   const m=await memberId(),attempt=id(p&&p.attemptId,'attemptId'),chapter=id(p&&p.chapterId,'chapterId');
-  const taskId=id(p&&p.taskId,'taskId'),selected=id(p&&p.selectedItemId,'selectedItemId');
+  const scenarioId=id(p&&p.scenarioId,'scenarioId'),selected=id(p&&p.selectedItemId,'selectedItemId');
   await ownedAttempt(m,attempt,chapter,'scenario');
-  const [task,chosen]=await Promise.all([
-    first(wixData.query(C.tasks).eq('chapterId',chapter).eq('itemId',taskId).eq('isActive',true)),
-    first(wixData.query(C.tasks).eq('chapterId',chapter).eq('itemId',selected).eq('isActive',true))
-  ]);
-  if(!task||!chosen||!task.correctAnswer)fail('SCENARIO_TASK_NOT_FOUND');
-  return saveAnswer(m,attempt,chapter,'scenario_'+taskId,selected,selected===task.correctAnswer,p&&p.timeSpentMs,{
+  const task=await wixData.get(C.tasks,scenarioId,O);
+  const chosen=await first(wixData.query(C.tasks).eq('chapterId',chapter).eq('itemId',selected).eq('isActive',true));
+  if(!task||task.chapterId!==chapter||!task.isActive||!chosen||!task.correctAnswer)fail('SCENARIO_TASK_NOT_FOUND');
+  return saveAnswer(m,attempt,chapter,'scenario_'+scenarioId,selected,selected===task.correctAnswer,p&&p.timeSpentMs,{
     correct:task.feedbackCorrect||local('',''),incorrect:task.feedbackIncorrect||local('',''),matchedItem:safeItem(task)});
 });
 
@@ -204,6 +240,14 @@ export const recordKeyboardAnswer=webMethod(Permissions.SiteMember,async p=>{
     expectedLabel:config.label});
 });
 
+
+export const checkKeyboardAnswerForAdmin=webMethod(Permissions.Admin,async p=>{
+  const taskKey=id(p&&p.taskKey,'taskKey'),config=SHORTCUTS[taskKey];
+  if(!config)fail('KEYBOARD_TASK_NOT_SUPPORTED');
+  const pressed=normalizeKeys(p&&p.keys),expected=config.keys.map(k=>k.split('+').sort().join('+'));
+  const isCorrect=expected.includes(pressed);
+  return {isCorrect,expectedLabel:isCorrect?config.label:null};
+});
 export const getChapterProgress=webMethod(Permissions.SiteMember,async p=>{
   const m=await memberId(),chapter=id(p&&p.chapterId,'chapterId');
   const row=await first(wixData.query(C.chapterProgress).eq('memberId',m).eq('chapterId',chapter));
