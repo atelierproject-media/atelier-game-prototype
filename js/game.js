@@ -154,7 +154,6 @@
   const isWixEmbedded = window.parent !== window;
   const wixPendingRequests = new Map();
   let wixRequestSequence = 0;
-  let wixWriteQueue = Promise.resolve();
   const remoteProgressCache = Object.create(null);
 
   window.addEventListener('message', event => {
@@ -187,17 +186,6 @@
     });
   }
 
-  function queueWixWrite(method, payload) {
-    if (!isWixEmbedded || previewMode) return Promise.resolve(null);
-    wixWriteQueue = wixWriteQueue
-      .then(() => callWixBackend(method, payload))
-      .catch(error => {
-        console.warn('[ATELIER Wix Sync]', method, error?.message || error);
-        return null;
-      });
-    return wixWriteQueue;
-  }
-
   async function refreshRemoteProgress() {
     if (!isWixEmbedded || previewMode || !chapters.length) return;
     const results = await Promise.all(chapters.map(async chapter => {
@@ -215,17 +203,6 @@
       changed = true;
     });
     if (changed && screen === 'chapters') renderChapterSelection();
-  }
-
-  function sendRemoteAttemptStart() {
-    if (!isWixEmbedded || previewMode || !activeChapter || !attemptId) return;
-    queueWixWrite('startAttempt', {
-      attemptId,
-      chapterId: activeChapter.id,
-      contentVersion: activeChapter.contentVersion || 1,
-      mode: 'matching',
-      totalQuestions: (activeChapter.matching?.pairs || []).length
-    });
   }
 
   async function loadAllChapters() {
