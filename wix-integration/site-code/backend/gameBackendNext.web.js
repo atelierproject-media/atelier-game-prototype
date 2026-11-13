@@ -258,7 +258,7 @@ export const checkKeyboardAnswerForAdmin=webMethod(Permissions.Admin,async p=>{
   if(!config)fail('KEYBOARD_TASK_NOT_SUPPORTED');
   const pressed=normalizeKeys(p&&p.keys),expected=config.keys.map(k=>k.split('+').sort().join('+'));
   const isCorrect=expected.includes(pressed);
-  return {isCorrect,expectedLabel:isCorrect?config.label:null};
+  return {isCorrect,expectedLabel:config.label};
 });
 export const getChapterProgress=webMethod(Permissions.SiteMember,async p=>{
   const m=await memberId(),chapter=id(p&&p.chapterId,'chapterId');
