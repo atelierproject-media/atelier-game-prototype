@@ -121,8 +121,12 @@ async function saveAnswer(member,attempt,chapter,pair,selected,correct,time,feed
     if(pair.indexOf('scenario_')===0||pair.indexOf('keyboard_')===0)await updateMember(member,chapter,0);
     else progress=await refreshMatchingProgress(member,chapter);
   }
+  const safeFeedback=(correct||revealed)
+    ? {correct:feedback&&feedback.correct||null,matchedItem:feedback&&feedback.matchedItem||null,
+       expectedLabel:feedback&&feedback.expectedLabel||null}
+    : {incorrect:feedback&&feedback.incorrect||null};
   return {answerId:saved._id,attemptNum,isCorrect:correct,isRevealed:revealed,
-    attemptsLeft:correct||revealed?0:Math.max(0,MAX_TRIES-attemptNum),feedback,progress};
+    attemptsLeft:correct||revealed?0:Math.max(0,MAX_TRIES-attemptNum),feedback:safeFeedback,progress};
 }
 function normalizeKeys(values){
   if(!Array.isArray(values)||values.length<1||values.length>4)fail('INVALID_KEY_COMBINATION');
