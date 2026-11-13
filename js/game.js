@@ -174,7 +174,7 @@
       const timer = window.setTimeout(() => {
         wixPendingRequests.delete(requestId);
         reject(new Error('WIX_REQUEST_TIMEOUT'));
-      }, 15000);
+      }, 30000);
       wixPendingRequests.set(requestId, { resolve, reject, timer });
       window.parent.postMessage({
         channel: 'ATELIER_WIX',
@@ -207,18 +207,19 @@
 
   async function loadAllChapters() {
     if (isWixEmbedded) {
-      const loaded = await Promise.all(CHAPTER_FILES.map(async id => {
-        try {
-          const method = previewMode ? 'getChapterBundleForAdmin' : 'getChapterBundle';
-          const cmsChapter = await callWixBackend(method, { chapterId: id });
-          if (cmsChapter?.id && Array.isArray(cmsChapter.items) && Array.isArray(cmsChapter.matching?.pairs)) return cmsChapter;
-          throw new Error('INVALID_CMS_CHAPTER_BUNDLE');
-        } catch (error) {
-          const message = error?.message || 'WIX_CONTENT_ERROR';
-          if (!previewMode && message.includes('CHAPTER_NOT_PUBLISHED')) return null;
-          throw error;
-        }
-      }));
+      let loaded;
+      if (previewMode) {
+        loaded = await Promise.all(CHAPTER_FILES.map(async id => {
+          const cmsChapter = await callWixBackend('getChapterBundleForAdmin', { chapterId: id });
+          if (!cmsChapter?.id || !Array.isArray(cmsChapter.items) || !Array.isArray(cmsChapter.matching?.pairs)) {
+            throw new Error('INVALID_CMS_CHAPTER_BUNDLE');
+          }
+          return cmsChapter;
+        }));
+      } else {
+        loaded = await callWixBackend('getPublishedChapterBundles');
+        if (!Array.isArray(loaded)) throw new Error('INVALID_PUBLISHED_CHAPTER_BUNDLES');
+      }
       chapters = loaded.filter(ch => ch && ch.status !== 'archived').sort((a,b) => a.order-b.order);
       if (!previewMode && !chapters.length) throw new Error('NO_PUBLISHED_CHAPTERS');
       return;
