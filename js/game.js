@@ -964,6 +964,15 @@
   }
 
   async function beginMatchingRound() {
+    try {
+      if(isWixEmbedded&&!previewMode){
+        remoteProgressCache[activeChapter.id]=await callWixBackend('getChapterProgress',{chapterId:activeChapter.id});
+      }
+    } catch(error) {
+      app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(error?.message||'PROGRESS_REFRESH_FAILED')}</p><button class="secondary-button" id="progress-refresh-back">${t('back')}</button></section>`;
+      document.getElementById('progress-refresh-back').onclick=()=>setScreen('activity');
+      return;
+    }
     const bank=(activeChapter?.matching?.pairs||[]).filter(pair=>pair&&pair.id&&(!pair.itemId||activeChapter.items.some(item=>item.id===pair.itemId)));
     const completedIds=isWixEmbedded&&!previewMode
       ?(remoteProgressCache[activeChapter.id]?.completedPairIds||[])
