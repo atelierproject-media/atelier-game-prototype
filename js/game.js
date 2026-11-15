@@ -4,8 +4,8 @@
 
   const LANG_KEY = 'lse320_language';
   const LOCAL_PLAYER_ID = 'local_standalone';
-  const PRIVACY_NOTICE_VERSION = 'draft-1';
-  const PRIVACY_POLICY_URL = 'privacy-policy.html?v=draft-1';
+  const PRIVACY_NOTICE_VERSION = 'draft-2';
+  const PRIVACY_POLICY_URL = 'privacy-policy.html?v=draft-2';
   let analyticsConsentEnabled = false;
   const CHAPTER_FILES = [
     'c01_tools','c02_shapes','c03_transformation_editing',
@@ -1551,6 +1551,7 @@
           <h2>${thai?'ข้อมูลที่ระบบใช้':'Data used by ATELIER'}</h2>
           <ul>
             <li>${thai?'รหัสสมาชิก Wix เพื่อเชื่อมประวัติกับบัญชีของคุณ':'Wix member identifier to connect records to your account'}</li>
+            <li>${thai?'ชื่อและอีเมล (ถ้ามี) ที่ทีมผู้ดูแลบันทึกแยกไว้เพื่อเชื่อมกับประวัติการฝึก โดยจำกัดการเข้าถึงเฉพาะ Admin':'Name and email (if provided) stored separately by the Admin team to link with learning records; access is restricted to Admins'}</li>
             <li>${thai?'Chapter และประเภทเกมที่เล่น':'Chapters and game modes you play'}</li>
             <li>${thai?'คำตอบ จำนวนครั้งที่ลอง คะแนน และการเปิดเฉลย':'Answers, attempts, scores and answer reveals'}</li>
             <li>${thai?'เวลาเริ่ม–จบและระยะเวลาการฝึก':'Start/end times and practice duration'}</li>
