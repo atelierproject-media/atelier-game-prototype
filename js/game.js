@@ -1291,6 +1291,9 @@
         <div class="progress-attempt-list">
           ${history.map(a=>{
             const chapter=chapters.find(ch=>ch.id===a.chapterId);
+            const chapterReference=chapter?.order
+              ?(lang==='th'?'บทที่ ':'CHAPTER ')+String(chapter.order).padStart(2,'0')
+              :a.chapterId;
             const label=modeLabel(a.mode);
             const date=a.startTime?new Date(a.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
             return `<article class="info-card progress-attempt-card progress-attempt-${modeClass(a.mode)}">
@@ -1300,6 +1303,7 @@
                 ${a.status==='in_progress'?'<span class="unfinished-pill">'+t('unfinishedLabel')+'</span>':''}
               </div>
               <div class="progress-attempt-main">
+                <small class="progress-attempt-chapter">${esc(chapterReference)}</small>
                 <strong>${esc(localized(chapter?.title)||a.chapterId)}</strong>
                 <small>${esc(date)}</small>
               </div>
