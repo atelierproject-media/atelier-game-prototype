@@ -1,7 +1,7 @@
 
 :root{--cream:#f7f1e9;--burgundy:#713c48;--rose:#c98f91;--sage:#718575;--ink:#302927;--paper:#fffdfa;--muted:#776e69;--line:#e6d8d2;--shadow:0 18px 48px rgba(65,40,40,.10)}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--cream);color:var(--ink);font-family:Inter,"Noto Sans Thai",Arial,sans-serif;display:flex;flex-direction:column}
+body{margin:0;min-height:100vh;background:var(--cream);color:var(--ink);font-family:"Bai Jamjuree",Inter,"Noto Sans Thai",Arial,sans-serif;display:flex;flex-direction:column}
 #background-atelier{position:fixed;inset:0;background:radial-gradient(circle at 80% 15%,rgba(201,143,145,.20),transparent 28%),radial-gradient(circle at 10% 80%,rgba(113,133,117,.14),transparent 28%);z-index:-1}
 .site-header{height:76px;padding:0 clamp(18px,5vw,72px);display:flex;align-items:center;justify-content:space-between;background:rgba(113,60,72,.97);color:#fffaf4;box-shadow:0 4px 18px rgba(0,0,0,.08)}
 .brand-button{margin:0;padding:0;border:0;background:none;color:inherit;font-family:Georgia,serif;font-size:24px;letter-spacing:.2px;cursor:pointer}
@@ -1136,4 +1136,29 @@ h1{font-weight:700;letter-spacing:-.025em}
   .progress-mode-card{
     padding:16px;
   }
+}
+
+
+/* Privacy notice and consent gate — ATELIER draft */
+.privacy-gate{max-width:820px;margin:1vh auto 4vh;text-align:left}
+.privacy-gate>.eyebrow{text-align:center}
+.privacy-gate>h1{text-align:center;font-size:clamp(28px,4.5vw,42px)}
+.privacy-gate>.lead{text-align:center;margin-bottom:26px}
+.privacy-summary{background:rgba(255,253,250,.96)}
+.privacy-summary h2{font-size:18px;margin-bottom:10px}
+.privacy-summary li{line-height:1.7}
+.privacy-summary .text-button{display:inline-block;padding-left:0;text-decoration:underline}
+.privacy-choice{background:#fbf5f1;border-color:#dfcbc5}
+.privacy-checkbox{display:flex;align-items:flex-start;gap:13px;cursor:pointer;line-height:1.6}
+.privacy-checkbox input{width:19px;height:19px;flex:0 0 19px;margin:4px 0 0;accent-color:var(--burgundy)}
+.privacy-checkbox span{display:flex;flex-direction:column;gap:7px}
+.privacy-checkbox strong{color:var(--burgundy);font-size:14px}
+.privacy-checkbox small{font-size:12px;color:var(--muted);line-height:1.7}
+.privacy-note{text-align:center;max-width:680px;margin:16px auto}
+.privacy-error{padding:12px 15px;border-radius:10px;background:#f8e9e7;color:#8a3030;border:1px solid #e5b9b4}
+.privacy-settings-actions{justify-content:flex-start}
+@media(max-width:700px){
+  .privacy-gate{margin:0 auto 3vh}
+  .privacy-gate>.lead{font-size:14px}
+  .privacy-checkbox{gap:10px}
 }
