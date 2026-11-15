@@ -38,7 +38,7 @@
       progressLabel:'ความคืบหน้า', roundNotice:'สุ่มโจทย์ที่ยังไม่ผ่านจากคลังคำถามของบทนี้', chapterProgress:'ความคืบหน้าของบทเรียน', remaining:'ข้อที่เหลือ', totalQuestions:'จำนวนข้อทั้งหมด', inProgress:'กำลังเรียน', notStarted:'ยังไม่เริ่ม', chapterCompleted:'เรียนครบแล้ว', continueRound:'ทำภารกิจรอบถัดไป', allQuestionsDone:'คุณทำโจทย์ครบทุกข้อในบทนี้แล้ว', roundComplete:'จบรอบการฝึก',
       chooseActivity:'เลือกภารกิจ', matchingMode:'จับคู่เครื่องมือกับหน้าที่',
       matchingModeLabel:'เกมจับคู่ · MATCHING', scenarioModeLabel:'เกมสถานการณ์ · SCENARIO',
-      keyboardModeLabel:'เกมคีย์ลัด · KEYBOARD', replayModeLabel:'ฝึกซ้ำ',
+      keyboardModeLabel:'เกมคีย์ลัด · KEYBOARD', replayModeLabel:'ฝึกซ้ำ', unfinishedLabel:'ยังไม่จบ',
       matchingProgressLabel:'ความคืบหน้าเกมจับคู่', scenarioProgressLabel:'ความคืบหน้าเกมสถานการณ์',
       keyboardProgressLabel:'ความคืบหน้าเกมคีย์ลัด', modeProgressHeading:'ความคืบหน้าแยกตามประเภทเกม',
       modeAttemptLabel:'รอบที่เล่น', modeCompletedLabel:'รอบที่จบ', modeAccuracyLabel:'ความถูกต้อง',
@@ -49,7 +49,7 @@
       scenarioIncorrect:'ยังไม่ถูกต้อง ลองสังเกตสิ่งที่โจทย์ต้องการทำ', scenarioResult:'ผลภารกิจสถานการณ์',
       scenarioScore:'ตอบถูก', of:'จาก',
       viewProgress:'ดูความคืบหน้าของฉัน', myProgress:'ความคืบหน้าการเรียนรู้',
-      overallProgress:'ภาพรวมการเรียนรู้', completedChaptersLabel:'บทเรียนที่เรียนครบ',
+      overallProgress:'ภาพรวมการเรียนรู้', completedChaptersLabel:'บทเรียนที่จับคู่ครบ',
       totalAttemptsLabel:'จำนวนรอบที่เล่น', accuracyLabel:'อัตราการตอบถูก',
       recentActivity:'ประวัติการฝึก', noProgress:'ยังไม่มีข้อมูลการฝึก เริ่มทำภารกิจเพื่อดูความคืบหน้า',
       signInProgress:'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูข้อมูลความคืบหน้าของคุณ',
@@ -83,7 +83,7 @@
       progressLabel:'Progress', roundNotice:'Questions not yet completed are selected from this chapter’s full question bank.', chapterProgress:'Chapter learning progress', remaining:'remaining', totalQuestions:'total questions', inProgress:'In progress', notStarted:'Not started', chapterCompleted:'Completed', continueRound:'Continue to next round', allQuestionsDone:'You have completed every question in this chapter.', roundComplete:'Practice round complete',
       chooseActivity:'Choose a mission', matchingMode:'Match tools with their functions',
       matchingModeLabel:'MATCHING GAME', scenarioModeLabel:'SCENARIO GAME',
-      keyboardModeLabel:'KEYBOARD CHALLENGE', replayModeLabel:'REPLAY',
+      keyboardModeLabel:'KEYBOARD CHALLENGE', replayModeLabel:'REPLAY', unfinishedLabel:'In progress',
       matchingProgressLabel:'Matching progress', scenarioProgressLabel:'Scenario progress',
       keyboardProgressLabel:'Keyboard progress', modeProgressHeading:'Progress by game mode',
       modeAttemptLabel:'Rounds played', modeCompletedLabel:'Rounds completed', modeAccuracyLabel:'Accuracy',
@@ -94,7 +94,7 @@
       scenarioIncorrect:'Not quite. Look carefully at what the task requires.', scenarioResult:'Scenario Mission Results',
       scenarioScore:'Correct answers', of:'of',
       viewProgress:'View my progress', myProgress:'My Learning Progress',
-      overallProgress:'Learning overview', completedChaptersLabel:'Completed chapters',
+      overallProgress:'Learning overview', completedChaptersLabel:'Matching-complete chapters',
       totalAttemptsLabel:'Practice attempts', accuracyLabel:'Answer accuracy',
       recentActivity:'Practice history', noProgress:'No practice data yet. Complete a mission to see your progress.',
       signInProgress:'Please sign in as a site member to view your learning progress.',
@@ -1297,6 +1297,7 @@
               <div class="progress-attempt-topline">
                 <span class="mode-pill mode-pill-${modeClass(a.mode)}">${esc(label)}</span>
                 ${a.isReplay?'<span class="replay-pill">'+t('replayModeLabel')+'</span>':''}
+                ${a.status==='in_progress'?'<span class="unfinished-pill">'+t('unfinishedLabel')+'</span>':''}
               </div>
               <div class="progress-attempt-main">
                 <strong>${esc(localized(chapter?.title)||a.chapterId)}</strong>
