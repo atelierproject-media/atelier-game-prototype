@@ -37,6 +37,13 @@
       attemptOf:'ครั้งที่', reviewFirst:'ทบทวนเนื้อหาให้พร้อมก่อนเริ่มจับคู่',
       progressLabel:'ความคืบหน้า', roundNotice:'สุ่มโจทย์ที่ยังไม่ผ่านจากคลังคำถามของบทนี้', chapterProgress:'ความคืบหน้าของบทเรียน', remaining:'ข้อที่เหลือ', totalQuestions:'จำนวนข้อทั้งหมด', inProgress:'กำลังเรียน', notStarted:'ยังไม่เริ่ม', chapterCompleted:'เรียนครบแล้ว', continueRound:'ทำภารกิจรอบถัดไป', allQuestionsDone:'คุณทำโจทย์ครบทุกข้อในบทนี้แล้ว', roundComplete:'จบรอบการฝึก',
       chooseActivity:'เลือกภารกิจ', matchingMode:'จับคู่เครื่องมือกับหน้าที่',
+      matchingModeLabel:'เกมจับคู่ · MATCHING', scenarioModeLabel:'เกมสถานการณ์ · SCENARIO',
+      keyboardModeLabel:'เกมคีย์ลัด · KEYBOARD', replayModeLabel:'ฝึกซ้ำ',
+      matchingProgressLabel:'ความคืบหน้าเกมจับคู่', scenarioProgressLabel:'ความคืบหน้าเกมสถานการณ์',
+      keyboardProgressLabel:'ความคืบหน้าเกมคีย์ลัด', modeProgressHeading:'ความคืบหน้าแยกตามประเภทเกม',
+      modeAttemptLabel:'รอบที่เล่น', modeCompletedLabel:'รอบที่จบ', modeAccuracyLabel:'ความถูกต้อง',
+      matchingDoneMessage:'คุณทำภารกิจจับคู่ของบทนี้ครบแล้ว สามารถฝึกซ้ำได้โดยระบบจะเก็บเป็นรอบใหม่และไม่ลบประวัติเดิม',
+      replayMatchingAction:'ฝึกเกมจับคู่อีกครั้ง', chooseAnotherMission:'กลับไปเลือกภารกิจ',
       scenarioMode:'เลือกเครื่องมือจากสถานการณ์', scenarioInstruction:'อ่านสถานการณ์และเลือกเครื่องมือ Illustrator ที่เหมาะสมที่สุดจาก 4 ตัวเลือก',
       scenarioQuestion:'สถานการณ์', nextQuestion:'ข้อต่อไป', scenarioCorrect:'ถูกต้อง! เลือกเครื่องมือได้เหมาะสมกับสถานการณ์',
       scenarioIncorrect:'ยังไม่ถูกต้อง ลองสังเกตสิ่งที่โจทย์ต้องการทำ', scenarioResult:'ผลภารกิจสถานการณ์',
@@ -75,6 +82,13 @@
       attemptOf:'Attempt', reviewFirst:'Review the content before starting the matching challenge.',
       progressLabel:'Progress', roundNotice:'Questions not yet completed are selected from this chapter’s full question bank.', chapterProgress:'Chapter learning progress', remaining:'remaining', totalQuestions:'total questions', inProgress:'In progress', notStarted:'Not started', chapterCompleted:'Completed', continueRound:'Continue to next round', allQuestionsDone:'You have completed every question in this chapter.', roundComplete:'Practice round complete',
       chooseActivity:'Choose a mission', matchingMode:'Match tools with their functions',
+      matchingModeLabel:'MATCHING GAME', scenarioModeLabel:'SCENARIO GAME',
+      keyboardModeLabel:'KEYBOARD CHALLENGE', replayModeLabel:'REPLAY',
+      matchingProgressLabel:'Matching progress', scenarioProgressLabel:'Scenario progress',
+      keyboardProgressLabel:'Keyboard progress', modeProgressHeading:'Progress by game mode',
+      modeAttemptLabel:'Rounds played', modeCompletedLabel:'Rounds completed', modeAccuracyLabel:'Accuracy',
+      matchingDoneMessage:'You have completed all matching tasks in this chapter. You can practise again as a new round without deleting previous history.',
+      replayMatchingAction:'Replay matching game', chooseAnotherMission:'Choose another mission',
       scenarioMode:'Choose a tool for a situation', scenarioInstruction:'Read the situation and choose the most suitable Illustrator tool from four options.',
       scenarioQuestion:'Situation', nextQuestion:'Next question', scenarioCorrect:'Correct! That tool fits the situation.',
       scenarioIncorrect:'Not quite. Look carefully at what the task requires.', scenarioResult:'Scenario Mission Results',
@@ -109,6 +123,7 @@
   let lastFeedback = null;
   let roundPairs = [];
   let matchingRoundsPlayed = 0;
+  let matchingReplay = false;
   const sessionCompletedPairIds = {};
   let resolvedItemIds = {};
   let savingAnswer = false;
@@ -248,6 +263,7 @@
     else if (screen === 'keyboard') renderKeyboardChallenge();
     else if (screen === 'scenarioResult') renderScenarioResult();
     else if (screen === 'matching') renderMatching();
+    else if (screen === 'matchingComplete') renderMatchingCompleted();
     else if (screen === 'result') renderResult();
     else if (screen === 'progress') renderProgress();
   }
@@ -266,6 +282,7 @@
     if (name === 'keyboard') renderKeyboardChallenge();
     if (name === 'scenarioResult') renderScenarioResult();
     if (name === 'matching') renderMatching();
+    if (name === 'matchingComplete') renderMatchingCompleted();
     if (name === 'result') renderResult();
     if (name === 'progress') renderProgress();
   }
@@ -964,7 +981,7 @@
     document.getElementById('scenario-chapters').onclick=()=>setScreen('chapters');
   }
 
-  async function beginMatchingRound() {
+  async function beginMatchingRound({ replay = false } = {}) {
     try {
       if(isWixEmbedded&&!previewMode){
         remoteProgressCache[activeChapter.id]=await callWixBackend('getChapterProgress',{chapterId:activeChapter.id});
@@ -981,14 +998,25 @@
         ?recordAdapter.getChapterProgress(LOCAL_PLAYER_ID,activeChapter.id,bank.map(p=>p.id)).completedPairIds
         :(sessionCompletedPairIds[activeChapter.id]||[]));
     const remaining=bank.filter(pair=>!completedIds.includes(pair.id));
-    if(!remaining.length){roundPairs=[];setScreen('result');return;}
-    roundPairs=shuffle(remaining).slice(0,Math.min(5,remaining.length));
+    if(!remaining.length&&!replay){
+      roundPairs=[];
+      setScreen('matchingComplete');
+      return;
+    }
+    const available=replay?bank:remaining;
+    if(!available.length){
+      app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>CHAPTER_HAS_NO_ACTIVE_CONTENT</p><button class="secondary-button" id="matching-empty-back">${t('back')}</button></section>`;
+      document.getElementById('matching-empty-back').onclick=()=>setScreen('activity');
+      return;
+    }
+    roundPairs=shuffle(available).slice(0,Math.min(5,available.length));
+    matchingReplay=replay;
     pairAttempts={};roundPairs.forEach(pair=>{pairAttempts[pair.id]=0;});
     matchedIds=new Set();revealedIds=new Set();resolvedItemIds={};selectedToolId=null;
     lastChoice=null;lastFeedback=null;stats=freshStats();pairStart=Date.now();attemptStartedAt=Date.now();savingAnswer=false;
     try{
       if(isWixEmbedded&&!previewMode){
-        const started=await callWixBackend('startAttempt',{chapterId:activeChapter.id,mode:'matching'});
+        const started=await callWixBackend('startAttempt',{chapterId:activeChapter.id,mode:'matching',replay});
         attemptId=started.attemptId;
       }else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
         attemptId=recordAdapter.startAttempt(LOCAL_PLAYER_ID,activeChapter.id,activeChapter.contentVersion||1);
@@ -998,6 +1026,28 @@
       app.innerHTML=`<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(error?.message||'ATTEMPT_START_FAILED')}</p><button class="secondary-button" id="attempt-start-back">${t('back')}</button></section>`;
       document.getElementById('attempt-start-back').onclick=()=>setScreen('activity');
     }
+  }
+
+  function renderMatchingCompleted() {
+    const progress=chapterProgress(activeChapter);
+    app.innerHTML=`
+      <section class="welcome-card result-screen matching-completed-screen">
+        <div class="eyebrow">${t('matchingModeLabel')} · ${t('chapter')} ${String(activeChapter.order).padStart(2,'0')}</div>
+        <h1>${t('chapterDone')}</h1>
+        <h2>${esc(localized(activeChapter.title))}</h2>
+        <div class="chapter-result-progress">
+          <div class="chapter-result-heading"><span>${t('matchingProgressLabel')}</span><strong>${progress.percent}%</strong></div>
+          <div class="progress-track"><i style="width:${progress.percent}%"></i></div>
+          <p>${progress.completed}/${progress.total} · 0 ${t('remaining')}</p>
+        </div>
+        <p class="lead">${t('matchingDoneMessage')}</p>
+        <div class="result-actions">
+          <button class="primary-button" id="replay-matching">${t('replayMatchingAction')}</button>
+          <button class="secondary-button" id="choose-another-mission">${t('chooseAnotherMission')}</button>
+        </div>
+      </section>`;
+    document.getElementById('replay-matching').onclick=()=>beginMatchingRound({replay:true});
+    document.getElementById('choose-another-mission').onclick=()=>setScreen('activity');
   }
 
   function renderMatching() {
@@ -1012,7 +1062,7 @@
         <div class="breadcrumb"><button class="text-button" id="matching-back">← ${t('back')}</button><span>/</span><span>${esc(localized(ch.title))}</span></div>
         <div class="section-heading"><div class="eyebrow">${t('chapter')} ${String(ch.order).padStart(2,'0')} · ${t('matchingIntro')}</div><h1>${t('matchingIntro')}</h1><p>${t('matchingInstruction')}</p></div>
         <div class="matching-dashboard">
-          <div class="matching-dashboard-top"><div><span class="eyebrow">${t('chapterProgress')}</span><strong>${esc(localized(ch.title))}</strong></div><span class="matching-round-label">${t('roundComplete')} · ${pairs.length} ${t('item')}</span></div>
+          <div class="matching-dashboard-top"><div><span class="eyebrow">${t('chapterProgress')}</span><strong>${esc(localized(ch.title))}</strong></div><span class="matching-round-label">${matchingReplay?t('replayModeLabel')+' · ':''}${t('roundComplete')} · ${pairs.length} ${t('item')}</span></div>
           <div class="matching-progress"><span>${t('completed')}: ${matchedIds.size+revealedIds.size}/${pairs.length}</span><div class="progress-track"><i style="width:${((matchedIds.size+revealedIds.size)/pairs.length)*100}%"></i></div></div>
           <div class="matching-bank-progress"><span>${t('chapterProgress')}</span><strong>${chapterProgress(ch).percent}%</strong><div class="progress-track"><i style="width:${chapterProgress(ch).percent}%"></i></div><small>${chapterProgress(ch).completed}/${chapterProgress(ch).total} · ${chapterProgress(ch).remaining} ${t('remaining')}</small></div>
         </div>
@@ -1147,47 +1197,54 @@
           <button class="secondary-button" id="to-chapters">${t('chapters')}</button>
         </div>
       </section>`;
-    if (complete) document.getElementById('replay').onclick = () => openChapter(activeChapter.id);
+    if (complete) document.getElementById('replay').onclick = () => beginMatchingRound({replay:true});
     else document.getElementById('next-round').onclick = () => beginMatchingRound();
     document.getElementById('to-chapters').onclick = () => setScreen('chapters');
   }
 
   async function renderProgress() {
-    app.innerHTML=`<section class="content-shell"><div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>${t('myProgress')}</h1><p>${t('loadingProgress')}</p></div></section>`;
+    app.innerHTML=`<section class="content-shell progress-screen"><div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>${t('myProgress')}</h1><p>${t('loadingProgress')}</p></div></section>`;
     let data=null,history=[];
     try{
       if(isWixEmbedded&&!previewMode){
         [data,history]=await Promise.all([
           callWixBackend('getMyProgress'),
-          callWixBackend('getMyGameHistory',{limit:12})
+          callWixBackend('getMyGameHistory',{limit:20})
         ]);
       }else if(!isWixEmbedded&&!previewMode&&typeof recordAdapter!=='undefined'){
         const attempts=recordAdapter.getAttemptHistory(LOCAL_PLAYER_ID);
-        history=attempts.slice().reverse().slice(0,12).map(a=>({attemptId:a.id,chapterId:a.chapterId,mode:'matching',status:a.status,startTime:a.startTime,
+        history=attempts.slice().reverse().slice(0,20).map(a=>({attemptId:a.id,chapterId:a.chapterId,mode:'matching',status:a.status,startTime:a.startTime,
           totalQuestions:a.stats?.totalCorrect||0,correctCount:a.stats?.totalCorrect||0,totalAttempts:a.stats?.totalCorrect||0,
-          scorePercent:0,timeSpentMs:0}));
-        data={completedChapterCount:0,totalAttempts:attempts.length,totalAnswers:0,accuracyPercent:0,chapters:chapters.map(ch=>{
+          scorePercent:0,timeSpentMs:0,isReplay:false}));
+        data={completedChapterCount:0,totalAttempts:attempts.length,totalAnswers:0,accuracyPercent:0,modeStats:{},chapters:chapters.map(ch=>{
           const ids=(ch.matching?.pairs||[]).map(p=>p.id);
           const p=recordAdapter.getChapterProgress(LOCAL_PLAYER_ID,ch.id,ids);
-          return {chapterId:ch.id,order:ch.order,title:ch.title,matchingCompleted:p.completedCount,matchingTotal:p.totalQuestions,progressPercent:p.progressPercent,remaining:p.remaining,status:p.status};
+          return {chapterId:ch.id,order:ch.order,title:ch.title,matchingCompleted:p.completedCount,matchingTotal:p.totalQuestions,
+            matchingProgressPercent:p.progressPercent,progressPercent:p.progressPercent,remaining:p.remaining,
+            scenarioQuestionsResolved:0,scenarioQuestionsTotal:0,scenarioProgressPercent:0,
+            keyboardQuestionsResolved:0,keyboardQuestionsTotal:0,keyboardProgressPercent:0};
         })};
       }else if(previewMode){
-        data={completedChapterCount:0,totalAttempts:0,totalAnswers:0,accuracyPercent:0,chapters:[]};
+        data={completedChapterCount:0,totalAttempts:0,totalAnswers:0,accuracyPercent:0,modeStats:{},chapters:[]};
       }
     }catch(error){
       const message=error?.message||'PROGRESS_LOAD_FAILED';
       const loginRequired=message.includes('MEMBER_LOGIN_REQUIRED');
-      app.innerHTML=`<section class="content-shell narrow-shell"><div class="section-heading"><h1>${t('myProgress')}</h1><p>${esc(loginRequired?t('signInProgress'):message)}</p></div><div class="page-actions"><button class="secondary-button" id="progress-home">${t('backHome')}</button></div></section>`;
+      app.innerHTML=`<section class="content-shell narrow-shell progress-screen"><div class="section-heading"><h1>${t('myProgress')}</h1><p>${esc(loginRequired?t('signInProgress'):message)}</p></div><div class="page-actions"><button class="secondary-button" id="progress-home">${t('backHome')}</button></div></section>`;
       document.getElementById('progress-home').onclick=()=>setScreen('home');
       return;
     }
     const chapterRows=(data?.chapters||[]).slice().sort((a,b)=>(a.order||0)-(b.order||0));
+    const modeStats=data?.modeStats||{};
     const fmtTime=ms=>{
       const minutes=Math.floor((ms||0)/60000),seconds=Math.floor(((ms||0)%60000)/1000);
       return minutes?minutes+`m `+seconds+`s`:seconds+`s`;
     };
+    const modeLabel=mode=>mode==='scenario'?t('scenarioModeLabel'):mode==='keyboard'?t('keyboardModeLabel'):t('matchingModeLabel');
+    const modeClass=mode=>mode==='scenario'?'scenario':mode==='keyboard'?'keyboard':'matching';
+    const modeOrder=['matching','scenario','keyboard'];
     app.innerHTML=`
-      <section class="content-shell">
+      <section class="content-shell progress-screen">
         <div class="breadcrumb"><button class="text-button" id="progress-home">← ${t('backHome')}</button><span>/</span><span>PROGRESS</span></div>
         <div class="section-heading"><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1>${t('myProgress')}</h1><p>${t('overallProgress')}</p></div>
         <div class="progress-overview-grid">
@@ -1195,25 +1252,58 @@
           <article class="result-stat"><strong>${data?.totalAttempts||0}</strong><span>${t('totalAttemptsLabel')}</span></article>
           <article class="result-stat"><strong>${data?.accuracyPercent||0}%</strong><span>${t('accuracyLabel')}</span></article>
         </div>
+        <div class="section-heading progress-subheading"><h2>${t('modeProgressHeading')}</h2></div>
+        <div class="progress-mode-grid">
+          ${modeOrder.map(mode=>{
+            const row=modeStats[mode]||{};
+            return `<article class="info-card progress-mode-card progress-mode-${modeClass(mode)}">
+              <span class="mode-pill mode-pill-${modeClass(mode)}">${modeLabel(mode)}</span>
+              <div class="progress-mode-attempts"><strong>${row.attemptCount||0}</strong><span>${t('modeAttemptLabel')}</span></div>
+              <div class="progress-mode-meta"><span>${t('modeCompletedLabel')}</span><b>${row.completedAttempts||0}</b></div>
+              <div class="progress-mode-meta"><span>${t('modeAccuracyLabel')}</span><b>${row.accuracyPercent||0}%</b></div>
+              <small>${row.correctAnswers||0}/${row.answerCount||0} ${t('scenarioScore')}</small>
+              ${row.replayCount?'<small>'+t('replayModeLabel')+': '+row.replayCount+'</small>':''}
+            </article>`;
+          }).join('')}
+        </div>
         <div class="section-heading progress-subheading"><h2>${t('chapterProgress')}</h2></div>
         <div class="progress-chapter-list">
           ${chapterRows.map(ch=>`<article class="info-card progress-chapter-card">
-            <div class="chapter-progress-meta"><b>${String(ch.order||0).padStart(2,'0')} · ${esc(localized(ch.title))}</b><b>${ch.progressPercent||0}%</b></div>
-            <div class="progress-track"><i style="width:${ch.progressPercent||0}%"></i></div>
-            <p>${ch.matchingCompleted||0}/${ch.matchingTotal||0} · ${ch.remaining||0} ${t('remaining')}</p>
-            <small>${t('scenarioMode')}: ${ch.scenarioQuestionsResolved||0} · ${lang==='th'?'คีย์ลัด':'Keyboard'}: ${ch.keyboardQuestionsResolved||0}</small>
+            <div class="chapter-progress-meta"><b>${String(ch.order||0).padStart(2,'0')} · ${esc(localized(ch.title))}</b></div>
+            <div class="mode-progress-row">
+              <div class="mode-progress-label"><span>${t('matchingProgressLabel')}</span><b>${ch.matchingProgressPercent??ch.progressPercent??0}%</b></div>
+              <div class="progress-track"><i style="width:${ch.matchingProgressPercent??ch.progressPercent??0}%"></i></div>
+              <small>${ch.matchingCompleted||0}/${ch.matchingTotal||0} · ${ch.remaining||0} ${t('remaining')}</small>
+            </div>
+            <div class="mode-progress-row">
+              <div class="mode-progress-label"><span>${t('scenarioProgressLabel')}</span><b>${ch.scenarioProgressPercent||0}%</b></div>
+              <div class="progress-track scenario-track"><i style="width:${ch.scenarioProgressPercent||0}%"></i></div>
+              <small>${ch.scenarioQuestionsResolved||0}/${ch.scenarioQuestionsTotal||0}</small>
+            </div>
+            <div class="mode-progress-row">
+              <div class="mode-progress-label"><span>${t('keyboardProgressLabel')}</span><b>${ch.keyboardProgressPercent||0}%</b></div>
+              <div class="progress-track keyboard-track"><i style="width:${ch.keyboardProgressPercent||0}%"></i></div>
+              <small>${ch.keyboardQuestionsResolved||0}/${ch.keyboardQuestionsTotal||0}</small>
+            </div>
           </article>`).join('')||`<p class="muted">${t('noProgress')}</p>`}
         </div>
         <div class="section-heading progress-subheading"><h2>${t('recentActivity')}</h2></div>
         <div class="progress-attempt-list">
           ${history.map(a=>{
             const chapter=chapters.find(ch=>ch.id===a.chapterId);
-            const mode=a.mode==='keyboard'?(lang==='th'?'ฝึกคีย์ลัด':'Keyboard'):a.mode==='scenario'?t('scenarioMode'):t('matchingMode');
+            const label=modeLabel(a.mode);
             const date=a.startTime?new Date(a.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
-            return `<article class="info-card progress-attempt-card">
-              <div><strong>${esc(localized(chapter?.title)||a.chapterId)}</strong><small>${esc(mode)} · ${esc(date)}</small></div>
+            return `<article class="info-card progress-attempt-card progress-attempt-${modeClass(a.mode)}">
+              <div class="progress-attempt-topline">
+                <span class="mode-pill mode-pill-${modeClass(a.mode)}">${esc(label)}</span>
+                ${a.isReplay?'<span class="replay-pill">'+t('replayModeLabel')+'</span>':''}
+              </div>
+              <div class="progress-attempt-main">
+                <strong>${esc(localized(chapter?.title)||a.chapterId)}</strong>
+                <small>${esc(date)}</small>
+              </div>
               <b>${a.correctCount||0}/${a.totalQuestions||0}</b>
-              <small>${a.scorePercent||0}% · ${fmtTime(a.timeSpentMs||0)}</small>
+              <small class="progress-attempt-score">${a.scorePercent||0}% · ${fmtTime(a.timeSpentMs||0)}</small>
             </article>`;
           }).join('')||`<p class="muted">${t('noProgress')}</p>`}
         </div>
