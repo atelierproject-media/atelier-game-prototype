@@ -1424,9 +1424,13 @@
       button.disabled=true;
       const analytics=document.getElementById('privacy-analytics-setting')?.checked===true;
       try{
-        await callWixBackend('recordMyPrivacyDecision',{
-          noticeAcknowledged:true,analyticsConsent:analytics,language:lang
-        });
+        if(!analytics&&analyticsConsentEnabled){
+          await callWixBackend('withdrawMyAnalyticsConsent');
+        }else{
+          await callWixBackend('recordMyPrivacyDecision',{
+            noticeAcknowledged:true,analyticsConsent:analytics,language:lang
+          });
+        }
         analyticsConsentEnabled=analytics;
         setScreen('progress');
       }catch(error){
