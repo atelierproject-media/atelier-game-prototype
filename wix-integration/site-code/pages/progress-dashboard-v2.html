@@ -141,6 +141,10 @@ h2{
 .progress-attempt-main{min-width:0;display:flex;flex-direction:column;gap:4px}
 .progress-attempt-main strong{color:var(--burgundy);font-size:14px;font-weight:700}
 .progress-attempt-main small{color:var(--muted);font-size:10px}
+.progress-attempt-main .chapter-reference{
+  color:var(--sage);font-size:10px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+}
 .progress-attempt-card>b{color:var(--burgundy);font-size:19px;font-weight:700}
 .progress-attempt-score{
   grid-column:1/-1;padding-top:6px;border-top:1px solid var(--line);
@@ -333,6 +337,9 @@ h2{
       byId('history').innerHTML=currentHistory.map(function(attempt){
         var chapter=chapters.find(function(ch){return ch.chapterId===attempt.chapterId;});
         var chapterTitle=localized(chapter&&chapter.title,attempt.chapterId);
+        var chapterReference=chapter&&chapter.order
+          ?(lang==='th'?'บทที่ ':'CHAPTER ')+String(chapter.order).padStart(2,'0')
+          :attempt.chapterId;
         var cls=modeClass(attempt.mode);
         var date=attempt.startTime?new Date(attempt.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
         var badges='<span class="mode-pill mode-pill-'+cls+'">'+modeName(attempt.mode)+'</span>';
@@ -340,7 +347,7 @@ h2{
         if(attempt.status==='in_progress')badges+='<span class="unfinished-pill">'+t('unfinished')+'</span>';
         return '<article class="progress-attempt-card progress-attempt-'+cls+'">'+
           '<div class="progress-attempt-topline">'+badges+'</div>'+
-          '<div class="progress-attempt-main"><strong>'+escapeHtml(chapterTitle)+'</strong><small>'+escapeHtml(date)+'</small></div>'+
+          '<div class="progress-attempt-main"><small class="chapter-reference">'+escapeHtml(chapterReference)+'</small><strong>'+escapeHtml(chapterTitle)+'</strong><small>'+escapeHtml(date)+'</small></div>'+
           '<b>'+Number(attempt.correctCount||0)+'/'+Number(attempt.totalQuestions||0)+'</b>'+
           '<small class="progress-attempt-score">'+Number(attempt.scorePercent||0)+'% · '+formatTime(attempt.timeSpentMs||0)+'</small>'+
         '</article>';
