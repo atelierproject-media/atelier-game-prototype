@@ -1004,6 +1004,16 @@ h1{font-weight:700;letter-spacing:-.025em}
   font-size:10px;
   font-weight:700;
 }
+.unfinished-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#f2ece7;
+  color:#76665d;
+  font-size:10px;
+  font-weight:700;
+}
 .progress-mode-attempts{
   display:flex;
   align-items:baseline;
