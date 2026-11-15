@@ -4,6 +4,9 @@
 
   const LANG_KEY = 'lse320_language';
   const LOCAL_PLAYER_ID = 'local_standalone';
+  const PRIVACY_NOTICE_VERSION = 'draft-1';
+  const PRIVACY_POLICY_URL = 'privacy-policy.html?v=draft-1';
+  let analyticsConsentEnabled = false;
   const CHAPTER_FILES = [
     'c01_tools','c02_shapes','c03_transformation_editing',
     'c04_color_gradient_appearance','c05_graph_canvas_navigation',
@@ -266,6 +269,8 @@
     else if (screen === 'matchingComplete') renderMatchingCompleted();
     else if (screen === 'result') renderResult();
     else if (screen === 'progress') renderProgress();
+    else if (screen === 'privacy') renderPrivacyGate();
+    else if (screen === 'privacySettings') renderPrivacySettings();
   }
 
   function setScreen(name) {
@@ -1314,6 +1319,11 @@
         </div>
       </section>`;
     document.getElementById('progress-home').onclick=()=>setScreen('home');
+    const privacyAction=document.createElement('div');
+    privacyAction.className='page-actions privacy-settings-actions';
+    privacyAction.innerHTML='<button class="text-button" id="privacy-manage">'+(lang==='th'?'จัดการความเป็นส่วนตัว':'Manage privacy settings')+'</button>';
+    app.querySelector('.progress-screen')?.appendChild(privacyAction);
+    document.getElementById('privacy-manage').onclick=()=>renderPrivacySettings();
   }
 
   langButton.addEventListener('click',()=> {
@@ -1324,25 +1334,143 @@
     if (screen !== 'matching') setScreen('home');
   });
 
+  function renderPrivacyGate(errorMessage='') {
+    screen='privacy';
+    const thai=lang==='th';
+    app.innerHTML=`
+      <section class="content-shell narrow-shell privacy-gate">
+        <div class="eyebrow">ATELIER · PRIVACY & DATA</div>
+        <h1>${thai?'ก่อนเริ่มเรียนรู้ กรุณาอ่านประกาศความเป็นส่วนตัว':'Before you start, read our Privacy Notice'}</h1>
+        <p class="lead">${thai
+          ?'ATELIER บันทึกข้อมูลการฝึกเพื่อแสดงความคืบหน้าและประวัติการเรียนรู้ของคุณ รายละเอียดและวัตถุประสงค์แสดงไว้ในประกาศความเป็นส่วนตัว'
+          :'ATELIER records practice activity to provide your personal progress and learning history. Please review the details and purposes in our Privacy Notice.'}</p>
+        <div class="info-card privacy-summary">
+          <h2>${thai?'ข้อมูลที่ระบบใช้':'Data used by ATELIER'}</h2>
+          <ul>
+            <li>${thai?'รหัสสมาชิก Wix เพื่อเชื่อมประวัติกับบัญชีของคุณ':'Wix member identifier to connect records to your account'}</li>
+            <li>${thai?'Chapter และประเภทเกมที่เล่น':'Chapters and game modes you play'}</li>
+            <li>${thai?'คำตอบ จำนวนครั้งที่ลอง คะแนน และการเปิดเฉลย':'Answers, attempts, scores and answer reveals'}</li>
+            <li>${thai?'เวลาเริ่ม–จบและระยะเวลาการฝึก':'Start/end times and practice duration'}</li>
+          </ul>
+          <p class="muted">${thai
+            ?'ข้อมูลส่วนบุคคลสำหรับ Progress ใช้แสดงผลเฉพาะบัญชีของคุณ ส่วนการวิเคราะห์แบบสรุปเพื่อพัฒนาสื่อเป็นตัวเลือกแยกต่างหาก'
+            :'Personal records support your own Progress page. Aggregated analysis for learning-media improvement is a separate optional choice.'}</p>
+        </div>
+        <div class="info-card privacy-summary">
+          <h2>${thai?'อ่านรายละเอียดฉบับเต็ม':'Read the full notice'}</h2>
+          <p>${thai?'ประกาศฉบับเต็มอธิบายผู้ควบคุมข้อมูล ข้อมูลที่เก็บ วัตถุประสงค์ ระยะเวลาเก็บ ผู้ให้บริการภายนอก สิทธิ และช่องทางติดต่อ':'The full notice explains the controller, data categories, purposes, retention, service providers, your rights and contact channel.'}</p>
+          <a class="text-button" href="${PRIVACY_POLICY_URL}" target="_blank" rel="noopener">${thai?'เปิด Privacy Policy ฉบับเต็ม ↗':'Open full Privacy Policy ↗'}</a>
+        </div>
+        <div class="info-card privacy-choice">
+          <label class="privacy-checkbox">
+            <input type="checkbox" id="privacy-analytics-choice">
+            <span>
+              <strong>${thai?'ยินยอมให้นำข้อมูลผลการฝึกแบบสรุปไปวิเคราะห์เพื่อพัฒนาสื่อการเรียนรู้ (ไม่บังคับ)':'I agree to let ATELIER use aggregated practice outcomes to improve learning materials (optional).'}</strong>
+              <small>${thai?'หากไม่เลือก ระบบยังบันทึก Progress ส่วนตัวตามที่แจ้งไว้ แต่จะไม่นำข้อมูลของคุณเข้าสู่ชุดวิเคราะห์แบบสรุป':'If left unchecked, your personal Progress still works as described, but your records are excluded from the aggregated analysis dataset.'}</small>
+            </span>
+          </label>
+        </div>
+        <p class="muted privacy-note">${thai
+          ?'การกดปุ่มด้านล่างเป็นการยืนยันว่าได้อ่านประกาศฉบับนี้ ไม่ใช่การบังคับให้ยินยอมต่อการวิเคราะห์ข้อมูลเพิ่มเติม'
+          :'The button below confirms that you have received this notice. It does not require you to opt in to optional analytics.'}</p>
+        ${errorMessage?'<p class="privacy-error" role="alert">'+esc(errorMessage)+'</p>':''}
+        <div class="page-actions">
+          <button class="primary-button" id="privacy-continue">${thai?'รับทราบและเริ่มเรียนรู้':'Acknowledge & Continue'}</button>
+        </div>
+      </section>`;
+    document.getElementById('privacy-continue').onclick=async()=>{
+      const button=document.getElementById('privacy-continue');
+      const analytics=document.getElementById('privacy-analytics-choice')?.checked===true;
+      button.disabled=true;
+      button.textContent=thai?'กำลังบันทึกการรับทราบ...':'Saving your choice...';
+      try{
+        const result=await callWixBackend('recordMyPrivacyDecision',{
+          noticeAcknowledged:true,analyticsConsent:analytics,language:lang
+        });
+        analyticsConsentEnabled=result.analyticsConsent===true;
+        enterExperienceAfterNotice();
+      }catch(error){
+        renderPrivacyGate(error?.message||'PRIVACY_DECISION_SAVE_FAILED');
+      }
+    };
+  }
+
+  function renderPrivacySettings() {
+    screen='privacySettings';
+    const thai=lang==='th';
+    app.innerHTML=`
+      <section class="content-shell narrow-shell privacy-gate">
+        <div class="eyebrow">ATELIER · PRIVACY SETTINGS</div>
+        <h1>${thai?'การตั้งค่าความเป็นส่วนตัว':'Privacy settings'}</h1>
+        <p class="lead">${thai?'คุณสามารถเปลี่ยนการยินยอมให้ใช้ข้อมูลผลการฝึกเพื่อการวิเคราะห์ได้ทุกเมื่อ':'You can change your optional analytics choice at any time.'}</p>
+        <div class="info-card privacy-choice">
+          <label class="privacy-checkbox">
+            <input type="checkbox" id="privacy-analytics-setting" ${analyticsConsentEnabled?'checked':''}>
+            <span>
+              <strong>${thai?'ยินยอมให้ใช้ข้อมูลผลการฝึกแบบสรุปเพื่อพัฒนาสื่อการเรียนรู้':'Allow aggregated practice outcomes to be used to improve learning materials'}</strong>
+              <small>${thai?'หากถอนความยินยอม ระบบจะไม่นำคำตอบใหม่ของคุณไปเพิ่มในชุดวิเคราะห์นับจากนี้ การถอนนี้ไม่ลบประวัติ Progress ส่วนตัวโดยอัตโนมัติ':'When withdrawn, new answers will no longer be added to the aggregated analysis dataset. This does not automatically delete the personal Progress history already stored.'}</small>
+            </span>
+          </label>
+        </div>
+        <a class="text-button" href="${PRIVACY_POLICY_URL}" target="_blank" rel="noopener">${thai?'อ่าน Privacy Policy':'Read Privacy Policy'} ↗</a>
+        <div class="page-actions">
+          <button class="secondary-button" id="privacy-settings-back">${thai?'กลับ':'Back'}</button>
+          <button class="primary-button" id="privacy-settings-save">${thai?'บันทึกการตั้งค่า':'Save settings'}</button>
+        </div>
+      </section>`;
+    document.getElementById('privacy-settings-back').onclick=()=>setScreen('progress');
+    document.getElementById('privacy-settings-save').onclick=async()=>{
+      const button=document.getElementById('privacy-settings-save');
+      button.disabled=true;
+      const analytics=document.getElementById('privacy-analytics-setting')?.checked===true;
+      try{
+        await callWixBackend('recordMyPrivacyDecision',{
+          noticeAcknowledged:true,analyticsConsent:analytics,language:lang
+        });
+        analyticsConsentEnabled=analytics;
+        setScreen('progress');
+      }catch(error){
+        button.disabled=false;
+        const note=document.createElement('p');
+        note.className='privacy-error';
+        note.textContent=error?.message||'PRIVACY_SETTINGS_SAVE_FAILED';
+        app.querySelector('.privacy-gate')?.appendChild(note);
+      }
+    };
+  }
+
+  function enterExperienceAfterNotice() {
+    const params=new URLSearchParams(location.search);
+    const previewChapter=params.get('chapter');
+    langButton.textContent=lang==='th'?'EN':'TH';
+    if(params.get('language')==='select')localStorage.removeItem(LANG_KEY);
+    if(previewMode&&previewChapter){
+      setScreen('language');
+      openChapter(previewChapter);
+    }else if(localStorage.getItem(LANG_KEY)){
+      setScreen('home');
+    }else{
+      setScreen('language');
+    }
+    if(isWixEmbedded)refreshRemoteProgress();
+  }
+
   async function boot() {
     app.innerHTML = `<section class="welcome-card"><p>${t('loading')}</p></section>`;
     try {
       await loadAllChapters();
       document.documentElement.lang = lang;
       langButton.textContent = lang === 'th' ? 'EN' : 'TH';
-      const params = new URLSearchParams(location.search);
-      const previewChapter = params.get('chapter');
-      if (params.get('language') === 'select') localStorage.removeItem(LANG_KEY);
-      if (previewMode && previewChapter) {
-        setScreen('language');
-        // In preview, skip the language gate and open requested chapter with saved/default language.
-        openChapter(previewChapter);
-      } else if (localStorage.getItem(LANG_KEY)) {
-        setScreen('home');
-      } else {
-        setScreen('language');
+      if(isWixEmbedded&&!previewMode){
+        const privacy=await callWixBackend('getMyPrivacyConsent');
+        if(!privacy||privacy.noticeAcknowledged!==true||privacy.noticeVersion!==PRIVACY_NOTICE_VERSION){
+          analyticsConsentEnabled=false;
+          renderPrivacyGate();
+          return;
+        }
+        analyticsConsentEnabled=privacy.analyticsConsent===true;
       }
-      if (isWixEmbedded) refreshRemoteProgress();
+      enterExperienceAfterNotice();
     } catch (err) {
       app.innerHTML = `<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(err.message)}</p><p>Run this project through a local web server (not by opening the HTML file directly).</p></section>`;
       console.error(err);
