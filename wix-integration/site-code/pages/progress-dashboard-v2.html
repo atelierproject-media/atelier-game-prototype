@@ -3,126 +3,375 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f0e8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<title>ATELIER · Learning Progress · v2</title>
+<title>ATELIER · Learning Progress</title>
 <style>
-:root{--ink:#173047;--burgundy:#713c48;--sage:#718575;--muted:#7d7771;--line:#eadeda;--paper:#fffdf9;--rose:#c98282}
+:root{
+  --cream:#f5f0e8;
+  --burgundy:#541c21;
+  --rose:#b5a682;
+  --sage:#718575;
+  --ink:#252b30;
+  --paper:#fffdf9;
+  --muted:#766f68;
+  --line:#ded4c6;
+  --navy:#041f3c;
+}
 *{box-sizing:border-box}
-body{margin:0;background:transparent;color:var(--ink);font:14px/1.55 Arial,sans-serif}
-.shell{max-width:1100px;margin:0 auto;padding:18px 8px 28px}
-.header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:22px}
-.eyebrow{color:var(--sage);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
-h1{margin:5px 0 4px;color:var(--burgundy);font:500 clamp(28px,4vw,42px)/1.1 Georgia,serif}
-.sub{margin:0;color:var(--muted)}
-.toggle{border:1px solid var(--line);border-radius:99px;background:var(--paper);padding:7px 12px;color:var(--burgundy);font-weight:700;cursor:pointer}
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0 30px}
-.kpi,.chapter,.attempt{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px}
-.kpi b{display:block;color:var(--burgundy);font:700 clamp(26px,3vw,36px)/1.1 Georgia,serif;margin-bottom:6px}
-.kpi span{color:var(--muted);font-size:12px}
-.section{display:flex;justify-content:space-between;align-items:center;margin:26px 0 12px}
-h2{font:500 22px Georgia,serif;color:var(--burgundy);margin:0}
-.chapter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.chapter-title{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.chapter-title b{color:var(--burgundy);font-size:14px}
-.percent{font:700 18px Georgia,serif;color:var(--burgundy);white-space:nowrap}
-.track{height:8px;background:#eadeda;border-radius:99px;overflow:hidden;margin:14px 0 8px}
-.track i{display:block;height:100%;background:var(--sage);border-radius:99px}
-.meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}
-.activity{display:grid;gap:10px}
-.attempt{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px 12px;padding:14px 16px}
-.attempt b{color:var(--burgundy)}
-.attempt small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-.score{color:var(--burgundy);font:700 18px Georgia,serif}
-.status{padding:24px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);background:rgba(255,253,249,.65)}
-.error{color:var(--burgundy)}
-/* ATELIER typography system — Bai Jamjuree across Thai and English dashboard text */
-html,body,body *{font-family:'Bai Jamjuree',sans-serif!important}
-@media(max-width:650px){.shell{padding:12px 4px 20px}.kpis{gap:8px}.kpi{padding:13px}.kpi span{font-size:10px}.chapter-grid{grid-template-columns:1fr}.attempt{padding:13px}.header{align-items:center}}
-@media(max-width:400px){.kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}}
+html,body{width:100%;min-height:100%;margin:0}
+body{
+  background:transparent;
+  color:var(--ink);
+  font:14px/1.65 'Bai Jamjuree',sans-serif;
+}
+button,a{font:inherit}
+.progress-screen,.progress-screen *{font-family:'Bai Jamjuree',sans-serif!important}
+.progress-screen{
+  width:100%;
+  max-width:1180px;
+  margin:0 auto;
+  padding:clamp(22px,4vw,48px) clamp(16px,4vw,48px) 40px;
+}
+.breadcrumb{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:24px;color:#9a8d86;font-size:12px;
+}
+.breadcrumb a{
+  color:var(--burgundy);text-decoration:none;font-weight:600;
+}
+.breadcrumb a:hover{text-decoration:underline}
+.section-heading{margin:8px 0 28px}
+.eyebrow{
+  color:var(--sage);font-size:10px;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase;
+}
+h1,h2,h3,p{margin-top:0}
+.section-heading h1{
+  margin:14px 0 8px;color:var(--burgundy);
+  font-size:clamp(30px,5vw,48px);line-height:1.2;font-weight:700;
+}
+.section-heading p{color:var(--muted);line-height:1.7;margin:0}
+h2{
+  margin:0;color:var(--burgundy);font-size:22px;
+  line-height:1.4;font-weight:600;
+}
+.progress-overview-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;margin:22px 0 34px;
+}
+.result-stat{
+  min-height:116px;display:flex;flex-direction:column;justify-content:center;gap:6px;
+  padding:18px;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+}
+.result-stat strong{
+  color:var(--burgundy);font-size:clamp(27px,3vw,38px);
+  line-height:1.15;font-weight:700;
+}
+.result-stat span{color:var(--muted);font-size:12px}
+.progress-subheading{margin:34px 0 16px}
+.progress-subheading h2{font-weight:600}
+.progress-mode-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
+}
+.progress-mode-card{
+  min-width:0;margin:0;padding:18px 20px;display:flex;flex-direction:column;gap:9px;
+  background:rgba(255,253,250,.96);border:1px solid var(--line);border-radius:16px;
+}
+.mode-pill{
+  display:inline-flex;align-items:center;width:max-content;max-width:100%;
+  padding:5px 10px;border:1px solid transparent;border-radius:999px;
+  font-size:10px;font-weight:700;line-height:1.45;letter-spacing:.025em;
+}
+.mode-pill-matching{color:#713c48;background:#f5e9e6;border-color:#e6cfca}
+.mode-pill-scenario{color:#385c62;background:#e9f1ef;border-color:#c8dcda}
+.mode-pill-keyboard{color:#65518a;background:#f0ebf7;border-color:#d9d0e8}
+.replay-pill,.unfinished-pill{
+  display:inline-flex;align-items:center;width:max-content;padding:4px 9px;
+  border-radius:999px;font-size:10px;font-weight:700;
+}
+.replay-pill{background:#f6f0df;color:#80632f}
+.unfinished-pill{background:#f2ece7;color:#76665d}
+.progress-mode-attempts{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.progress-mode-attempts strong{color:var(--burgundy);font-size:32px;line-height:1;font-weight:700}
+.progress-mode-attempts span,.progress-mode-meta span{color:var(--muted);font-size:11px}
+.progress-mode-meta{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding-top:7px;border-top:1px solid var(--line);
+}
+.progress-mode-meta b{color:var(--burgundy);font-size:14px}
+.progress-mode-card>small{color:var(--muted);font-size:10px}
+.progress-chapter-list,.progress-attempt-list{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+}
+.progress-chapter-card{
+  min-width:0;margin:0;padding:20px;display:flex;flex-direction:column;gap:15px;
+  background:rgba(255,253,250,.96);border:1px solid var(--line);border-radius:16px;
+}
+.chapter-progress-meta{font-size:13px;color:var(--burgundy)}
+.chapter-progress-meta b{font-weight:700}
+.mode-progress-row{display:grid;gap:6px}
+.mode-progress-label{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  color:var(--muted);font-size:11px;
+}
+.mode-progress-label b{color:var(--burgundy);font-size:12px;font-weight:700}
+.progress-track{width:100%;height:7px;margin:0;overflow:hidden;background:#eadeda;border-radius:99px}
+.progress-track i{display:block;height:100%;border-radius:99px;background:var(--sage)}
+.progress-track.scenario-track i{background:#668b8b}
+.progress-track.keyboard-track i{background:#9179ad}
+.mode-progress-row>small{color:var(--muted);font-size:10px}
+.progress-attempt-card{
+  min-width:0;margin:0;padding:16px 18px;display:grid;
+  grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 12px;
+  background:rgba(255,253,250,.96);border:1px solid var(--line);border-radius:16px;
+}
+.progress-attempt-topline{
+  grid-column:1/-1;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.progress-attempt-main{min-width:0;display:flex;flex-direction:column;gap:4px}
+.progress-attempt-main strong{color:var(--burgundy);font-size:14px;font-weight:700}
+.progress-attempt-main small{color:var(--muted);font-size:10px}
+.progress-attempt-card>b{color:var(--burgundy);font-size:19px;font-weight:700}
+.progress-attempt-score{
+  grid-column:1/-1;padding-top:6px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;
+}
+.status{
+  padding:24px;border:1px dashed var(--line);border-radius:14px;
+  color:var(--muted);background:rgba(255,253,249,.65);
+}
+.status.error{color:var(--burgundy)}
+@media(max-width:760px){
+  .progress-mode-grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .progress-screen{padding:20px 14px 28px}
+  .progress-overview-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .progress-overview-grid .result-stat:last-child{grid-column:1/-1}
+  .progress-chapter-list,.progress-attempt-list{grid-template-columns:1fr}
+  .progress-chapter-card{padding:16px}
+  .progress-mode-card{padding:16px}
+  .section-heading h1{font-size:32px}
+}
 </style>
 </head>
 <body>
-<div class="shell">
-  <header class="header">
-    <div><div class="eyebrow">ATELIER · LEARNING JOURNAL</div><h1 id="title">ความคืบหน้าการเรียนรู้</h1><p class="sub" id="subtitle">ติดตามพัฒนาการจากการฝึก Mini Tasks</p></div>
-    <button class="toggle" id="language">EN</button>
-  </header>
-  <div class="kpis">
-    <article class="kpi"><b id="completed">—</b><span id="completed-label">บทเรียนที่เรียนครบ</span></article>
-    <article class="kpi"><b id="attempts">—</b><span id="attempts-label">จำนวนรอบที่เล่น</span></article>
-    <article class="kpi"><b id="accuracy">—</b><span id="accuracy-label">อัตราการตอบถูก</span></article>
+<main class="progress-screen" id="progress-screen">
+  <div class="breadcrumb">
+    <a href="https://atelierprojectmedi.wixsite.com/group9" target="_top" rel="noopener">← <span id="back-home">กลับหน้าแรก</span></a>
+    <span>/</span><span>PROGRESS</span>
   </div>
-  <section>
-    <div class="section"><h2 id="chapter-heading">ความคืบหน้ารายบท</h2></div>
-    <div class="chapter-grid" id="chapters"><div class="status" id="loading">กำลังโหลดข้อมูล...</div></div>
-  </section>
-  <section>
-    <div class="section"><h2 id="activity-heading">ประวัติการฝึกล่าสุด</h2></div>
-    <div class="activity" id="history"><div class="status">กำลังโหลดข้อมูล...</div></div>
-  </section>
-</div>
+  <div class="section-heading">
+    <div class="eyebrow">ATELIER · LEARNING JOURNAL</div>
+    <h1 id="title">ความคืบหน้าการเรียนรู้</h1>
+    <p id="subtitle">ภาพรวมการเรียนรู้</p>
+  </div>
+  <div class="progress-overview-grid">
+    <article class="result-stat"><strong id="completed">—</strong><span id="completed-label">บทเรียนที่จับคู่ครบ</span></article>
+    <article class="result-stat"><strong id="attempts">—</strong><span id="attempts-label">จำนวนรอบที่เล่น</span></article>
+    <article class="result-stat"><strong id="accuracy">—</strong><span id="accuracy-label">อัตราการตอบถูก</span></article>
+  </div>
+  <div class="section-heading progress-subheading"><h2 id="mode-heading">ความคืบหน้าแยกตามประเภทเกม</h2></div>
+  <div class="progress-mode-grid" id="mode-stats">
+    <div class="status">กำลังโหลดข้อมูล...</div>
+  </div>
+  <div class="section-heading progress-subheading"><h2 id="chapter-heading">ความคืบหน้าของบทเรียน</h2></div>
+  <div class="progress-chapter-list" id="chapters">
+    <div class="status">กำลังโหลดข้อมูล...</div>
+  </div>
+  <div class="section-heading progress-subheading"><h2 id="history-heading">ประวัติการฝึก</h2></div>
+  <div class="progress-attempt-list" id="history">
+    <div class="status">กำลังโหลดข้อมูล...</div>
+  </div>
+</main>
 <script>
 (function(){
-  var lang='th',sequence=0;
-  var strings={
-    th:{title:'ความคืบหน้าการเรียนรู้',subtitle:'ติดตามพัฒนาการจากการฝึก Mini Tasks',completed:'บทเรียนที่เรียนครบ',attempts:'จำนวนรอบที่เล่น',accuracy:'อัตราการตอบถูก',chapters:'ความคืบหน้ารายบท',history:'ประวัติการฝึกล่าสุด',loading:'กำลังโหลดข้อมูล...',noData:'ยังไม่มีข้อมูลการฝึก เริ่มเล่น Mini Tasks เพื่อบันทึกพัฒนาการของคุณ',failed:'โหลดข้อมูลไม่สำเร็จ',signIn:'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูผลการเรียนรู้',remaining:'ข้อที่เหลือ',matching:'จับคู่เครื่องมือ',scenario:'สถานการณ์',keyboard:'ฝึกคีย์ลัด',complete:'เรียนครบแล้ว',progress:'กำลังเรียน',notStarted:'ยังไม่เริ่ม',answer:'ตอบถูก',score:'คะแนน',en:'EN'},
-    en:{title:'My Learning Progress',subtitle:'Track your development through Mini Tasks',completed:'Completed chapters',attempts:'Practice attempts',accuracy:'Answer accuracy',chapters:'Chapter progress',history:'Recent practice history',loading:'Loading your learning progress...',noData:'No practice data yet. Start a Mini Task to record your progress.',failed:'Unable to load progress',signIn:'Please sign in as a site member to view your learning results',remaining:'remaining',matching:'Tool matching',scenario:'Scenario',keyboard:'Keyboard practice',complete:'Completed',progress:'In progress',notStarted:'Not started',answer:'Correct',score:'Score',en:'TH'}
+  'use strict';
+  var lang='th';
+  var requestNumber=0;
+  var currentProgress=null;
+  var currentHistory=[];
+  var COPY={
+    th:{
+      backHome:'กลับหน้าแรก',title:'ความคืบหน้าการเรียนรู้',subtitle:'ภาพรวมการเรียนรู้',
+      completed:'บทเรียนที่จับคู่ครบ',attempts:'จำนวนรอบที่เล่น',accuracy:'อัตราการตอบถูก',
+      modeHeading:'ความคืบหน้าแยกตามประเภทเกม',chapterHeading:'ความคืบหน้าของบทเรียน',
+      historyHeading:'ประวัติการฝึก',matching:'เกมจับคู่ · MATCHING',
+      scenario:'เกมสถานการณ์ · SCENARIO',keyboard:'เกมคีย์ลัด · KEYBOARD',
+      rounds:'รอบที่เล่น',finished:'รอบที่จบ',accuracyLabel:'ความถูกต้อง',
+      correct:'ตอบถูก',replay:'ฝึกซ้ำ',unfinished:'ยังไม่จบ',
+      matchingProgress:'ความคืบหน้าเกมจับคู่',
+      scenarioProgress:'ความคืบหน้าเกมสถานการณ์',
+      keyboardProgress:'ความคืบหน้าเกมคีย์ลัด',
+      remaining:'ข้อที่เหลือ',loading:'กำลังโหลดข้อมูล...',
+      noData:'ยังไม่มีข้อมูลการฝึก',signIn:'กรุณาเข้าสู่ระบบสมาชิกเพื่อดูผลการเรียนรู้',
+      loadError:'โหลดข้อมูลไม่สำเร็จ',of:'จาก'
+    },
+    en:{
+      backHome:'Home',title:'My Learning Progress',subtitle:'Learning overview',
+      completed:'Matching-complete chapters',attempts:'Practice rounds',accuracy:'Answer accuracy',
+      modeHeading:'Progress by game mode',chapterHeading:'Chapter progress',
+      historyHeading:'Practice history',matching:'MATCHING GAME',
+      scenario:'SCENARIO GAME',keyboard:'KEYBOARD CHALLENGE',
+      rounds:'Rounds played',finished:'Rounds completed',accuracyLabel:'Accuracy',
+      correct:'Correct',replay:'REPLAY',unfinished:'IN PROGRESS',
+      matchingProgress:'Matching progress',scenarioProgress:'Scenario progress',
+      keyboardProgress:'Keyboard progress',remaining:'remaining',
+      loading:'Loading your learning progress...',noData:'No practice data yet',
+      signIn:'Please sign in to view your learning progress',
+      loadError:'Unable to load progress',of:'of'
+    }
   };
-  function t(k){return strings[lang][k]||k;}
-  function text(id,value){document.getElementById(id).textContent=value;}
-  function render(data,history){
-    text('title',t('title'));text('subtitle',t('subtitle'));
-    text('completed-label',t('completed'));text('attempts-label',t('attempts'));text('accuracy-label',t('accuracy'));
-    text('chapter-heading',t('chapters'));text('activity-heading',t('history'));text('language',t('en'));
-    text('completed',(data.completedChapterCount||0)+'');
-    text('attempts',(data.totalAttempts||0)+'');
-    text('accuracy',(data.accuracyPercent||0)+'%');
-    var chapters=document.getElementById('chapters');
-    if(!data.chapters||!data.chapters.length){chapters.innerHTML='<div class="status">'+t('noData')+'</div>';}
-    else{
-      chapters.innerHTML=data.chapters.map(function(ch){
-        var title=(ch.title&&ch.title[lang])||ch.chapterId;
-        var status=ch.status==='completed'?t('complete'):ch.status==='in_progress'?t('progress'):t('notStarted');
-        var percent=Number(ch.progressPercent)||0;
-        return '<article class="chapter"><div class="chapter-title"><div><b>'+escapeHtml(title)+'</b><small>'+escapeHtml(status)+'</small></div><span class="percent">'+percent+'%</span></div><div class="track"><i style="width:'+percent+'%"></i></div><div class="meta"><span>'+(ch.matchingCompleted||0)+' / '+(ch.matchingTotal||0)+'</span><span>'+(ch.remaining||0)+' '+t('remaining')+'</span></div><div class="meta"><span>'+t('scenario')+': '+(ch.scenarioQuestionsResolved||0)+'</span><span>'+t('keyboard')+': '+(ch.keyboardQuestionsResolved||0)+'</span></div></article>';
+  function t(key){return COPY[lang][key]||key;}
+  function byId(id){return document.getElementById(id);}
+  function setText(id,value){byId(id).textContent=value;}
+  function escapeHtml(value){
+    return String(value==null?'':value).replace(/[&<>"']/g,function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+  function localized(value,fallback){
+    if(value&&typeof value==='object') return value[lang]||value.th||value.en||fallback||'';
+    return value||fallback||'';
+  }
+  function modeName(mode){
+    if(mode==='scenario')return t('scenario');
+    if(mode==='keyboard')return t('keyboard');
+    return t('matching');
+  }
+  function modeClass(mode){
+    if(mode==='scenario')return 'scenario';
+    if(mode==='keyboard')return 'keyboard';
+    return 'matching';
+  }
+  function formatTime(ms){
+    var value=Number(ms)||0;
+    var minutes=Math.floor(value/60000);
+    var seconds=Math.floor((value%60000)/1000);
+    return minutes?minutes+'m '+seconds+'s':seconds+'s';
+  }
+  function render(progress,history){
+    currentProgress=progress||{};
+    currentHistory=Array.isArray(history)?history:[];
+    setText('back-home',t('backHome'));
+    setText('title',t('title'));
+    setText('subtitle',t('subtitle'));
+    setText('completed-label',t('completed'));
+    setText('attempts-label',t('attempts'));
+    setText('accuracy-label',t('accuracy'));
+    setText('mode-heading',t('modeHeading'));
+    setText('chapter-heading',t('chapterHeading'));
+    setText('history-heading',t('historyHeading'));
+    setText('completed',(progress.completedChapterCount||0)+'/'+((progress.chapters||[]).length||0));
+    setText('attempts',String(progress.totalAttempts||0));
+    setText('accuracy',(progress.accuracyPercent||0)+'%');
+
+    var modes=['matching','scenario','keyboard'];
+    byId('mode-stats').innerHTML=modes.map(function(mode){
+      var stats=(progress.modeStats&&progress.modeStats[mode])||{};
+      var cls=modeClass(mode);
+      var replayLine=mode==='matching'&&(stats.replayCount||0)>0
+        ?'<small>'+t('replay')+': '+stats.replayCount+'</small>':'';
+      return '<article class="progress-mode-card progress-mode-'+cls+'">'+
+        '<span class="mode-pill mode-pill-'+cls+'">'+modeName(mode)+'</span>'+
+        '<div class="progress-mode-attempts"><strong>'+Number(stats.attemptCount||0)+'</strong><span>'+t('rounds')+'</span></div>'+
+        '<div class="progress-mode-meta"><span>'+t('finished')+'</span><b>'+Number(stats.completedAttempts||0)+'</b></div>'+
+        '<div class="progress-mode-meta"><span>'+t('accuracyLabel')+'</span><b>'+Number(stats.accuracyPercent||0)+'%</b></div>'+
+        '<small>'+Number(stats.correctAnswers||0)+'/'+Number(stats.answerCount||0)+' '+t('correct')+'</small>'+
+        replayLine+
+      '</article>';
+    }).join('');
+
+    var chapters=Array.isArray(progress.chapters)?progress.chapters:[];
+    if(!chapters.length){
+      byId('chapters').innerHTML='<div class="status">'+t('noData')+'</div>';
+    }else{
+      byId('chapters').innerHTML=chapters.slice().sort(function(a,b){return (a.order||0)-(b.order||0);}).map(function(ch){
+        var title=localized(ch.title,ch.chapterId);
+        var matching=Number(ch.matchingProgressPercent!=null?ch.matchingProgressPercent:ch.progressPercent)||0;
+        var scenario=Number(ch.scenarioProgressPercent)||0;
+        var keyboard=Number(ch.keyboardProgressPercent)||0;
+        return '<article class="progress-chapter-card">'+
+          '<div class="chapter-progress-meta"><b>'+String(ch.order||0).padStart(2,'0')+' · '+escapeHtml(title)+'</b></div>'+
+          '<div class="mode-progress-row">'+
+            '<div class="mode-progress-label"><span>'+t('matchingProgress')+'</span><b>'+matching+'%</b></div>'+
+            '<div class="progress-track"><i style="width:'+Math.max(0,Math.min(100,matching))+'%"></i></div>'+
+            '<small>'+Number(ch.matchingCompleted||0)+'/'+Number(ch.matchingTotal||0)+' · '+Number(ch.remaining||0)+' '+t('remaining')+'</small>'+
+          '</div>'+
+          '<div class="mode-progress-row">'+
+            '<div class="mode-progress-label"><span>'+t('scenarioProgress')+'</span><b>'+scenario+'%</b></div>'+
+            '<div class="progress-track scenario-track"><i style="width:'+Math.max(0,Math.min(100,scenario))+'%"></i></div>'+
+            '<small>'+Number(ch.scenarioQuestionsResolved||0)+'/'+Number(ch.scenarioQuestionsTotal||0)+'</small>'+
+          '</div>'+
+          '<div class="mode-progress-row">'+
+            '<div class="mode-progress-label"><span>'+t('keyboardProgress')+'</span><b>'+keyboard+'%</b></div>'+
+            '<div class="progress-track keyboard-track"><i style="width:'+Math.max(0,Math.min(100,keyboard))+'%"></i></div>'+
+            '<small>'+Number(ch.keyboardQuestionsResolved||0)+'/'+Number(ch.keyboardQuestionsTotal||0)+'</small>'+
+          '</div>'+
+        '</article>';
       }).join('');
     }
-    var log=document.getElementById('history');
-    if(!history||!history.length){log.innerHTML='<div class="status">'+t('noData')+'</div>';}
-    else{
-      log.innerHTML=history.map(function(a){
-        var ch=data.chapters.find(function(c){return c.chapterId===a.chapterId;});
-        var name=ch&&ch.title?ch.title[lang]:a.chapterId;
-        var mode=a.mode==='keyboard'?t('keyboard'):a.mode==='scenario'?t('scenario'):t('matching');
-        var date=a.startTime?new Date(a.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
-        return '<article class="attempt"><div><b>'+escapeHtml(name)+'</b><small>'+escapeHtml(mode)+' · '+escapeHtml(date)+'</small></div><div class="score">'+(a.correctCount||0)+' / '+(a.totalQuestions||0)+'</div><small>'+t('score')+': '+(a.scorePercent||0)+'%</small><small>'+t('answer')+': '+(a.correctCount||0)+' / '+(a.totalAttempts||0)+'</small></article>';
+
+    if(!currentHistory.length){
+      byId('history').innerHTML='<div class="status">'+t('noData')+'</div>';
+    }else{
+      byId('history').innerHTML=currentHistory.map(function(attempt){
+        var chapter=chapters.find(function(ch){return ch.chapterId===attempt.chapterId;});
+        var chapterTitle=localized(chapter&&chapter.title,attempt.chapterId);
+        var cls=modeClass(attempt.mode);
+        var date=attempt.startTime?new Date(attempt.startTime).toLocaleString(lang==='th'?'th-TH':'en-US'):'';
+        var badges='<span class="mode-pill mode-pill-'+cls+'">'+modeName(attempt.mode)+'</span>';
+        if(attempt.isReplay)badges+='<span class="replay-pill">'+t('replay')+'</span>';
+        if(attempt.status==='in_progress')badges+='<span class="unfinished-pill">'+t('unfinished')+'</span>';
+        return '<article class="progress-attempt-card progress-attempt-'+cls+'">'+
+          '<div class="progress-attempt-topline">'+badges+'</div>'+
+          '<div class="progress-attempt-main"><strong>'+escapeHtml(chapterTitle)+'</strong><small>'+escapeHtml(date)+'</small></div>'+
+          '<b>'+Number(attempt.correctCount||0)+'/'+Number(attempt.totalQuestions||0)+'</b>'+
+          '<small class="progress-attempt-score">'+Number(attempt.scorePercent||0)+'% · '+formatTime(attempt.timeSpentMs||0)+'</small>'+
+        '</article>';
       }).join('');
     }
   }
-  function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function showError(message){
+    var output='<div class="status error">'+escapeHtml(message)+'</div>';
+    byId('mode-stats').innerHTML=output;
+    byId('chapters').innerHTML=output;
+    byId('history').innerHTML='';
+  }
   function request(){
-    sequence++;
-    document.getElementById('chapters').innerHTML='<div class="status">'+t('loading')+'</div>';
-    document.getElementById('history').innerHTML='<div class="status">'+t('loading')+'</div>';
-    window.parent.postMessage({channel:'ATELIER_PROGRESS',kind:'request',requestId:'progress_'+Date.now()+'_'+sequence,method:'loadProgress'},'*');
+    requestNumber++;
+    var id='progress_'+Date.now()+'_'+requestNumber;
+    byId('mode-stats').innerHTML='<div class="status">'+t('loading')+'</div>';
+    byId('chapters').innerHTML='<div class="status">'+t('loading')+'</div>';
+    byId('history').innerHTML='<div class="status">'+t('loading')+'</div>';
+    window.parent.postMessage({
+      channel:'ATELIER_PROGRESS',
+      kind:'request',
+      requestId:id,
+      method:'loadProgress'
+    },'*');
   }
   window.addEventListener('message',function(event){
     if(event.source!==window.parent)return;
     var msg=event.data;
     if(!msg||msg.channel!=='ATELIER_PROGRESS'||msg.kind!=='response')return;
     if(!msg.ok){
-      var error=String(msg.error||'');
-      var message=error.indexOf('MEMBER_LOGIN_REQUIRED')>=0?t('signIn'):t('failed');
-      document.getElementById('chapters').innerHTML='<div class="status error">'+message+'</div>';
-      document.getElementById('history').innerHTML='';
+      showError(String(msg.error||'').indexOf('MEMBER_LOGIN_REQUIRED')>=0?t('signIn'):t('loadError'));
       return;
     }
-    render(msg.data.progress,msg.data.history);
+    render(msg.data&&msg.data.progress,msg.data&&msg.data.history);
   });
-  document.getElementById('language').addEventListener('click',function(){lang=lang==='th'?'en':'th';text('title',t('title'));text('subtitle',t('subtitle'));request();});
-  render({completedChapterCount:0,totalAttempts:0,accuracyPercent:0,chapters:[]},[]);
+  document.addEventListener('click',function(event){
+    if(event.target&&event.target.id==='language-toggle'){
+      lang=lang==='th'?'en':'th';
+      if(currentProgress)render(currentProgress,currentHistory);
+    }
+  });
+  // Render a stable shell before requesting member-scoped data.
+  render({completedChapterCount:0,totalAttempts:0,accuracyPercent:0,modeStats:{},chapters:[]},[]);
   request();
 })();
 </script>
