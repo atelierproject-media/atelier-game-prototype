@@ -44,6 +44,13 @@ button,a{font:inherit}
 }
 .breadcrumb a:hover{text-decoration:underline}
 .section-heading{margin:8px 0 28px}
+.progress-heading-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.language-toggle{
+  flex:0 0 auto;border:1px solid var(--line);border-radius:999px;
+  background:var(--paper);padding:8px 14px;color:var(--burgundy);
+  font-size:12px;font-weight:700;cursor:pointer;
+}
+.language-toggle:hover{background:#f5e9e6;border-color:#e6cfca}
 .eyebrow{
   color:var(--sage);font-size:10px;font-weight:800;
   letter-spacing:.18em;text-transform:uppercase;
@@ -165,9 +172,14 @@ h2{
     <span>/</span><span>PROGRESS</span>
   </div>
   <div class="section-heading">
-    <div class="eyebrow">ATELIER · LEARNING JOURNAL</div>
-    <h1 id="title">ความคืบหน้าการเรียนรู้</h1>
-    <p id="subtitle">ภาพรวมการเรียนรู้</p>
+    <div class="progress-heading-row">
+      <div>
+        <div class="eyebrow">ATELIER · LEARNING JOURNAL</div>
+        <h1 id="title">ความคืบหน้าการเรียนรู้</h1>
+        <p id="subtitle">ภาพรวมการเรียนรู้</p>
+      </div>
+      <button type="button" class="language-toggle" id="language-toggle">EN</button>
+    </div>
   </div>
   <div class="progress-overview-grid">
     <article class="result-stat"><strong id="completed">—</strong><span id="completed-label">บทเรียนที่จับคู่ครบ</span></article>
