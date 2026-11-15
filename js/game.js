@@ -108,6 +108,8 @@
   const app = document.getElementById('app-container');
   const progressLabel = document.getElementById('progress-text');
   const langButton = document.getElementById('language-toggle');
+  const adminNavButton = document.getElementById('admin-nav');
+  let adminAvailable = false;
   const previewMode = new URLSearchParams(location.search).get('preview') === 'true';
   let lang = localStorage.getItem(LANG_KEY) || 'th';
   if (!['th','en'].includes(lang)) lang = 'th';
@@ -271,6 +273,7 @@
     else if (screen === 'progress') renderProgress();
     else if (screen === 'privacy') renderPrivacyGate();
     else if (screen === 'privacySettings') renderPrivacySettings();
+    else if (screen === 'admin') renderAdminDashboard();
   }
 
   function setScreen(name) {
@@ -290,6 +293,7 @@
     if (name === 'matchingComplete') renderMatchingCompleted();
     if (name === 'result') renderResult();
     if (name === 'progress') renderProgress();
+    if (name === 'admin') renderAdminDashboard();
   }
 
   function renderLanguage() {
@@ -1333,6 +1337,205 @@
   document.getElementById('brand-home').addEventListener('click',()=> {
     if (screen !== 'matching') setScreen('home');
   });
+  adminNavButton?.addEventListener('click', () => {
+    if (adminAvailable) setScreen('admin');
+  });
+
+  async function refreshAdminAccess() {
+    adminAvailable = false;
+    if (adminNavButton) adminNavButton.hidden = true;
+    if (!isWixEmbedded || previewMode) return false;
+    try {
+      const result = await callWixBackend('checkAdminAccess');
+      adminAvailable = result?.isAdmin === true;
+    } catch (_) {
+      adminAvailable = false;
+    }
+    if (adminNavButton) adminNavButton.hidden = !adminAvailable;
+    return adminAvailable;
+  }
+
+
+  async function renderAdminDashboard() {
+    screen = 'admin';
+    const thai = lang === 'th';
+    const homeLabel = thai ? 'กลับหน้าแรก' : 'Back home';
+    const refreshLabel = thai ? 'รีเฟรชข้อมูล' : 'Refresh';
+    const title = thai ? 'จัดการข้อมูลผู้เรียน' : 'Learner Directory';
+    app.innerHTML =
+      '<section class="content-shell admin-screen">' +
+        '<div class="breadcrumb">' +
+          '<button class="text-button" id="admin-home">← ' + homeLabel + '</button>' +
+          '<span>/</span><span>ADMIN</span>' +
+          '<button class="text-button" id="admin-refresh">' + refreshLabel + '</button>' +
+        '</div>' +
+        '<div class="section-heading">' +
+          '<div class="eyebrow">ATELIER · ADMINISTRATION</div>' +
+          '<h1>' + title + '</h1>' +
+          '<p>' + (thai
+            ? 'เชื่อมรายชื่อผู้เรียนกับผลการฝึกด้วย Member ID ข้อมูลชื่อและอีเมลจะแสดงเฉพาะผู้ดูแลระบบ'
+            : 'Connect learner identity to practice records using Member ID. Names and emails are visible only to administrators.') + '</p>' +
+        '</div>' +
+        '<p class="admin-loading">' + (thai ? 'กำลังโหลดข้อมูลผู้เรียน...' : 'Loading learner records...') + '</p>' +
+      '</section>';
+    document.getElementById('admin-home').onclick = () => setScreen('home');
+    document.getElementById('admin-refresh').onclick = () => renderAdminDashboard();
+
+    if (!adminAvailable || !isWixEmbedded || previewMode) {
+      const loading = app.querySelector('.admin-loading');
+      if (loading) loading.textContent = thai
+        ? 'หน้านี้สำหรับผู้ดูแลระบบเท่านั้น'
+        : 'This page is available to administrators only.';
+      return;
+    }
+
+    let data;
+    try {
+      data = await callWixBackend('getAdminLearnerDashboard');
+    } catch (_) {
+      const loading = app.querySelector('.admin-loading');
+      if (loading) loading.textContent = thai
+        ? 'ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบสิทธิ์ Admin แล้วลองใหม่'
+        : 'Could not load learner data. Check Admin access and try again.';
+      return;
+    }
+
+    const summary = data && data.summary ? data.summary : {};
+    const learners = Array.isArray(data && data.learners) ? data.learners : [];
+    const fmtTime = ms => {
+      const seconds = Math.floor((Number(ms) || 0) / 1000);
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return hours ? hours + 'h ' + minutes + 'm' : minutes + 'm';
+    };
+    const fmtDate = value => value
+      ? new Date(value).toLocaleString(thai ? 'th-TH' : 'en-US')
+      : '—';
+    const missingLabel = thai ? 'ยังไม่กรอกข้อมูลประจำตัว' : 'Profile needed';
+    const statusLabel = value => value === 'inactive'
+      ? (thai ? 'ปิดใช้งาน' : 'Inactive')
+      : (thai ? 'ใช้งาน' : 'Active');
+
+    const learnerCards = learners.map((learner, index) => {
+      const status = learner.directoryStatus === 'inactive' ? 'inactive' : 'active';
+      const heading = learner.displayName || missingLabel;
+      const directoryStatus = learner.hasDirectoryEntry
+        ? statusLabel(status)
+        : missingLabel;
+      const directoryClass = learner.hasDirectoryEntry
+        ? (status === 'inactive' ? 'is-pending' : 'is-ready')
+        : 'is-pending';
+      const initialStatus = learner.hasDirectoryEntry
+        ? (thai ? 'บันทึกไว้แล้ว' : 'Saved')
+        : (thai ? 'ยังไม่มีข้อมูล Directory' : 'Not in directory yet');
+      return '<article class="info-card admin-learner-card" data-member-id="' + esc(learner.memberId) + '">' +
+        '<div class="admin-learner-heading"><div>' +
+          '<span class="eyebrow">' + (thai ? 'ผู้เรียน ' : 'LEARNER ') + String(index + 1).padStart(2, '0') + '</span>' +
+          '<h2>' + esc(heading) + '</h2>' +
+          '<small class="admin-member-id">Member ID: ' + esc(learner.memberId) + '</small>' +
+        '</div><span class="admin-directory-status ' + directoryClass + '">' + directoryStatus + '</span></div>' +
+        '<div class="admin-learner-stats">' +
+          '<div><strong>' + (learner.attemptCount || 0) + '</strong><small>' + (thai ? 'รอบที่เล่น' : 'Attempts') + '</small></div>' +
+          '<div><strong>' + (learner.completedAttemptCount || 0) + '</strong><small>' + (thai ? 'รอบที่เสร็จ' : 'Completed') + '</small></div>' +
+          '<div><strong>' + (learner.accuracyPercent || 0) + '%</strong><small>' + (thai ? 'ตอบถูก' : 'Accuracy') + '</small></div>' +
+          '<div><strong>' + (learner.completedChapterCount || 0) + '</strong><small>' + (thai ? 'บทที่ผ่าน' : 'Chapters done') + '</small></div>' +
+          '<div><strong>' + fmtTime(learner.totalPlayTimeMs) + '</strong><small>' + (thai ? 'เวลาเรียนรวม' : 'Practice time') + '</small></div>' +
+          '<div><strong>' + esc(fmtDate(learner.lastActive)) + '</strong><small>' + (thai ? 'ใช้งานล่าสุด' : 'Last active') + '</small></div>' +
+        '</div>' +
+        '<div class="admin-learner-fields">' +
+          '<label>' + (thai ? 'ชื่อผู้เรียน' : 'Learner name') +
+            '<input type="text" data-field="displayName" maxlength="120" value="' + esc(learner.displayName || '') + '" placeholder="' + (thai ? 'กรอกชื่อ-นามสกุล' : 'Enter full name') + '">' +
+          '</label>' +
+          '<label>' + (thai ? 'อีเมล' : 'Email') +
+            '<input type="email" data-field="email" maxlength="254" value="' + esc(learner.email || '') + '" placeholder="name@example.com">' +
+          '</label>' +
+          '<label>' + (thai ? 'รหัสผู้เข้าร่วม (ใช้ในรายงาน)' : 'Participant code (for reports)') +
+            '<input type="text" data-field="participantCode" maxlength="40" value="' + esc(learner.participantCode || '') + '" placeholder="AT-001">' +
+          '</label>' +
+          '<label>' + (thai ? 'สถานะ' : 'Status') +
+            '<select data-field="status">' +
+              '<option value="active" ' + (status !== 'inactive' ? 'selected' : '') + '>' + (thai ? 'ใช้งาน' : 'Active') + '</option>' +
+              '<option value="inactive" ' + (status === 'inactive' ? 'selected' : '') + '>' + (thai ? 'ปิดใช้งาน' : 'Inactive') + '</option>' +
+            '</select>' +
+          '</label>' +
+        '</div>' +
+        '<div class="admin-learner-actions">' +
+          '<span class="admin-save-status" aria-live="polite">' + initialStatus + '</span>' +
+          '<button class="primary-button admin-save-learner" type="button">' + (thai ? 'บันทึกข้อมูลผู้เรียน' : 'Save learner profile') + '</button>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    app.innerHTML =
+      '<section class="content-shell admin-screen">' +
+        '<div class="breadcrumb">' +
+          '<button class="text-button" id="admin-home">← ' + homeLabel + '</button>' +
+          '<span>/</span><span>ADMIN</span>' +
+          '<button class="text-button" id="admin-refresh">' + refreshLabel + '</button>' +
+        '</div>' +
+        '<div class="section-heading">' +
+          '<div class="eyebrow">ATELIER · ADMINISTRATION</div>' +
+          '<h1>' + title + '</h1>' +
+          '<p>' + (thai
+            ? 'ข้อมูลชื่อและอีเมลแสดงเฉพาะในส่วน Admin ระเบียนคะแนนและคำตอบยังเชื่อมด้วย Member ID'
+            : 'Names and emails are shown only in Admin. Game attempts and answers remain linked by Member ID.') + '</p>' +
+        '</div>' +
+        '<div class="admin-metrics-grid">' +
+          '<article class="result-stat"><strong>' + (summary.learnerCount || 0) + '</strong><span>' + (thai ? 'ผู้เรียนที่พบในระบบ' : 'Learners found') + '</span></article>' +
+          '<article class="result-stat"><strong>' + (summary.directoryCount || 0) + '</strong><span>' + (thai ? 'มีข้อมูลใน Directory' : 'Profiles completed') + '</span></article>' +
+          '<article class="result-stat"><strong>' + (summary.learnersNeedingProfile || 0) + '</strong><span>' + (thai ? 'รอกรอกชื่อ/อีเมล' : 'Profiles needed') + '</span></article>' +
+          '<article class="result-stat"><strong>' + (summary.attemptCount || 0) + '</strong><span>' + (thai ? 'รอบการฝึกทั้งหมด' : 'Practice attempts') + '</span></article>' +
+        '</div>' +
+        (data.truncated ? '<p class="admin-warning">' + (thai
+          ? 'ขณะนี้อ่านได้สูงสุด 1,000 ระเบียนต่อชุดข้อมูล หากมีผู้เรียนมากกว่านี้ต้องเพิ่มระบบแบ่งหน้า'
+          : 'Each collection is currently limited to 1,000 records. Pagination is needed for larger datasets.') + '</p>' : '') +
+        '<div class="admin-learner-list">' +
+          (learnerCards || '<p class="muted">' + (thai ? 'ยังไม่มีข้อมูลผู้เรียน' : 'No learner records yet') + '</p>') +
+        '</div>' +
+      '</section>';
+
+    document.getElementById('admin-home').onclick = () => setScreen('home');
+    document.getElementById('admin-refresh').onclick = () => renderAdminDashboard();
+
+    app.querySelectorAll('.admin-save-learner').forEach(button => {
+      button.onclick = async () => {
+        const card = button.closest('.admin-learner-card');
+        if (!card) return;
+        const status = card.querySelector('.admin-save-status');
+        const value = field => {
+          const input = card.querySelector('[data-field="' + field + '"]');
+          return input ? input.value : '';
+        };
+        button.disabled = true;
+        button.textContent = thai ? 'กำลังบันทึก...' : 'Saving...';
+        try {
+          await callWixBackend('saveAdminLearnerProfile', {
+            memberId: card.dataset.memberId,
+            displayName: value('displayName'),
+            email: value('email'),
+            participantCode: value('participantCode'),
+            status: value('status')
+          });
+          if (status) status.textContent = thai ? 'บันทึกแล้ว' : 'Saved successfully';
+          await renderAdminDashboard();
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = thai ? 'ลองบันทึกอีกครั้ง' : 'Try again';
+          if (status) {
+            const code = error && error.message ? error.message : 'SAVE_FAILED';
+            status.textContent = code === 'LEARNER_NAME_REQUIRED'
+              ? (thai ? 'กรุณากรอกชื่อผู้เรียน' : 'Learner name is required')
+              : code === 'INVALID_EMAIL'
+                ? (thai ? 'รูปแบบอีเมลไม่ถูกต้อง' : 'Email format is invalid')
+                : code === 'LEARNER_RECORD_NOT_FOUND'
+                  ? (thai ? 'ไม่พบระเบียนผู้เรียน' : 'Learner record not found')
+                  : code;
+            status.classList.add('is-error');
+          }
+        }
+      };
+    });
+  }
 
   function renderPrivacyGate(errorMessage='') {
     screen='privacy';
@@ -1388,7 +1591,7 @@
           noticeAcknowledged:true,analyticsConsent:analytics,language:lang
         });
         analyticsConsentEnabled=result.analyticsConsent===true;
-        enterExperienceAfterNotice();
+        await enterExperienceAfterNotice();
       }catch(error){
         renderPrivacyGate(error?.message||'PRIVACY_DECISION_SAVE_FAILED');
       }
@@ -1443,7 +1646,8 @@
     };
   }
 
-  function enterExperienceAfterNotice() {
+  async function enterExperienceAfterNotice() {
+    await refreshAdminAccess();
     const params=new URLSearchParams(location.search);
     const previewChapter=params.get('chapter');
     langButton.textContent=lang==='th'?'EN':'TH';
@@ -1474,7 +1678,7 @@
         }
         analyticsConsentEnabled=privacy.analyticsConsent===true;
       }
-      enterExperienceAfterNotice();
+      await enterExperienceAfterNotice();
     } catch (err) {
       app.innerHTML = `<section class="welcome-card"><h1>${t('loadError')}</h1><p>${esc(err.message)}</p><p>Run this project through a local web server (not by opening the HTML file directly).</p></section>`;
       console.error(err);
