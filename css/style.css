@@ -1115,6 +1115,13 @@ h1{font-weight:700;letter-spacing:-.025em}
   color:var(--muted);
   font-size:10px;
 }
+.progress-attempt-main .progress-attempt-chapter{
+  color:var(--sage);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
 .progress-attempt-score{
   grid-column:1/-1;
 }
